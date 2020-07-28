@@ -260,7 +260,7 @@ public:
 
     virtual void setDigitalGain(int dg)
     {
-        mAudioInterface->setDigitalGain(dg);
+        digitalGain = dg;
     }
 
     virtual int getReceiverBindPort() const
@@ -331,6 +331,7 @@ public:
     virtual void setAudioInterface(AudioInterface *const AudioInterface)
     {
         mAudioInterface = AudioInterface;
+        mAudioInterface->setDigitalGain(digitalGain);
     }
 
     void setSampleRate(uint32_t sample_rate)
@@ -641,6 +642,7 @@ private:
 
     bool mConnectDefaultAudioPorts; ///< Connect or not default audio ports
     std::ostream mIOStatLogStream;
+    int digitalGain;
 };
 
 #endif
