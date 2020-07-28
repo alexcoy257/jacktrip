@@ -35,7 +35,6 @@
  * \date July 2008
  */
 
-
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
@@ -61,7 +60,7 @@ public:
     virtual ~Settings();
 
     /// \brief Parses command line input
-    void parseInput(int argc, char** argv);
+    void parseInput(int argc, char **argv);
 
     void startJackTrip();
     void stopJackTrip();
@@ -70,12 +69,11 @@ public:
     void printUsage();
 
     bool getLoopBack() { return mLoopBack; }
-    int getIOStatTimeout() const {return mIOStatTimeout;}
-    const std::ostream& getIOStatStream() const
+    int getIOStatTimeout() const { return mIOStatTimeout; }
+    const std::ostream &getIOStatStream() const
     {
-        return mIOStatStream.is_open() ? (std::ostream&)mIOStatStream : std::cout;
+        return mIOStatStream.is_open() ? (std::ostream &)mIOStatStream : std::cout;
     }
-
 
 public slots:
     void slotExitProgram()
@@ -85,35 +83,35 @@ public slots:
     }
 
 private:
-    JackTrip* mJackTrip; ///< JackTrip class
+    JackTrip *mJackTrip;                   ///< JackTrip class
     JackTrip::jacktripModeT mJackTripMode; ///< JackTrip::jacktripModeT
     JackTrip::dataProtocolT mDataProtocol; ///< Data Protocol
-    int mNumChans; ///< Number of Channels (inputs = outputs)
-    int mBufferQueueLength; ///< Audio Buffer from network queue length
+    int mNumChans;                         ///< Number of Channels (inputs = outputs)
+    int mBufferQueueLength;                ///< Audio Buffer from network queue length
     AudioInterface::audioBitResolutionT mAudioBitResolution;
     QString mPeerAddress; ///< Peer Address to use in jacktripModeT::CLIENT Mode
-    int mBindPortNum; ///< Bind Port Number
-    int mPeerPortNum; ///< Peer Port Number
-    char* mClientName; ///< JackClient Name
-    bool mUnderrrunZero; ///< Use Underrun to Zero mode
+    int mBindPortNum;     ///< Bind Port Number
+    int mPeerPortNum;     ///< Peer Port Number
+    char *mClientName;    ///< JackClient Name
+    bool mUnderrrunZero;  ///< Use Underrun to Zero mode
 
-#ifdef WAIR // wair
-    int mNumNetRevChans; ///< Number of Network Audio Channels (net comb filters)
-    int mClientAddCombLen; ///< cmd line adjustment of net comb
+#ifdef WAIR                 // wair
+    int mNumNetRevChans;    ///< Number of Network Audio Channels (net comb filters)
+    int mClientAddCombLen;  ///< cmd line adjustment of net comb
     double mClientRoomSize; ///< freeverb room size
-    bool mWAIR; ///< WAIR mode
-#endif // endwhere
+    bool mWAIR;             ///< WAIR mode
+#endif                      // endwhere
 
-    bool mLoopBack; ///< Loop-back mode
-    bool mJamLink; ///< JamLink mode
-    bool mEmptyHeader; ///< EmptyHeader mode
-    bool mJackTripServer; ///< JackTrip Server mode
-    QString mLocalAddress; ///< Local Address
+    bool mLoopBack;           ///< Loop-back mode
+    bool mJamLink;            ///< JamLink mode
+    bool mEmptyHeader;        ///< EmptyHeader mode
+    bool mJackTripServer;     ///< JackTrip Server mode
+    QString mLocalAddress;    ///< Local Address
     unsigned int mRedundancy; ///< Redundancy factor for data in the network
-    bool mUseJack; ///< Use or not JackAduio
-    bool mChanfeDefaultSR; ///< Change Default Sampling Rate
-    bool mChanfeDefaultID; ///< Change Default device ID
-    bool mChanfeDefaultBS; ///< Change Default Buffer Size
+    bool mUseJack;            ///< Use or not JackAduio
+    bool mChanfeDefaultSR;    ///< Change Default Sampling Rate
+    bool mChanfeDefaultID;    ///< Change Default device ID
+    bool mChanfeDefaultBS;    ///< Change Default Buffer Size
     unsigned int mSampleRate;
     unsigned int mDeviceID;
     unsigned int mAudioBufferSize;
@@ -121,6 +119,7 @@ private:
     bool mConnectDefaultAudioPorts; ///< Connect or not jack audio ports
     int mIOStatTimeout;
     std::ofstream mIOStatStream;
+    int digitalGain;
 };
 
 #endif

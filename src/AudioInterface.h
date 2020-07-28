@@ -50,31 +50,31 @@ class JackTrip;
 
 //using namespace JackTripNamespace;
 
-
 /** \brief Base Class that provides an interface with audio
  */
 class AudioInterface
 {
 public:
-
     /// \brief Enum for Audio Resolution in bits
-    enum audioBitResolutionT {
-        BIT8  = 1, ///< 8 bits
+    enum audioBitResolutionT
+    {
+        BIT8 = 1,  ///< 8 bits
         BIT16 = 2, ///< 16 bits (default)
         BIT24 = 3, ///< 24 bits
         BIT32 = 4  ///< 32 bits
     };
 
     /// \brief Sampling Rates supported by JACK
-    enum samplingRateT {
-        SR22, ///<  22050 Hz
-        SR32, ///<  32000 Hz
-        SR44, ///<  44100 Hz
-        SR48, ///<  48000 Hz
-        SR88, ///<  88200 Hz
-        SR96, ///<  96000 Hz
+    enum samplingRateT
+    {
+        SR22,  ///<  22050 Hz
+        SR32,  ///<  32000 Hz
+        SR44,  ///<  44100 Hz
+        SR48,  ///<  48000 Hz
+        SR88,  ///<  88200 Hz
+        SR96,  ///<  96000 Hz
         SR192, ///< 192000 Hz
-        UNDEF ///< Undefined
+        UNDEF  ///< Undefined
     };
 
     /** \brief The class constructor
@@ -83,13 +83,13 @@ public:
    * \param NumOutChans Number of Output Channels
    * \param AudioBitResolution Audio Sample Resolutions in bits
    */
-    AudioInterface(JackTrip* jacktrip,
+    AudioInterface(JackTrip *jacktrip,
                    int NumInChans, int NumOutChans,
-               #ifdef WAIR // wair
+#ifdef WAIR // wair
                    int NumNetRevChans,
-               #endif // endwhere
+#endif // endwhere
                    AudioInterface::audioBitResolutionT AudioBitResolution =
-            AudioInterface::BIT16);
+                       AudioInterface::BIT16);
     /// \brief The class destructor
     virtual ~AudioInterface();
 
@@ -115,8 +115,8 @@ public:
     * \param in_buffer Array of output audio samplers for each channel. The user
     * is reponsible to check that each channel has n_frames samplers
     */
-    virtual void callback(QVarLengthArray<sample_t*>& in_buffer,
-                          QVarLengthArray<sample_t*>& out_buffer,
+    virtual void callback(QVarLengthArray<sample_t *> &in_buffer,
+                          QVarLengthArray<sample_t *> &out_buffer,
                           unsigned int n_frames);
     /** \brief Append a ProcessPlugin. The order of processing is determined by
    * the order by which appending is done.
@@ -124,7 +124,7 @@ public:
    * using something like:\n
    * <tt>std::tr1::shared_ptr<ProcessPluginName> loopback(new ProcessPluginName);</tt>
    */
-    virtual void appendProcessPlugin(ProcessPlugin* plugin);
+    virtual void appendProcessPlugin(ProcessPlugin *plugin);
     virtual void connectDefaultPorts() = 0;
     /** \brief Convert a 32bit number (sample_t) into one of the bit resolution
    * supported (audioBitResolutionT).
@@ -133,8 +133,8 @@ public:
    * appropriate size to hold the value. The caller is responsible to allocate
    * enough space to store the result.
    */
-    static void fromSampleToBitConversion(const sample_t* const input,
-                                          int8_t* output,
+    static void fromSampleToBitConversion(const sample_t *const input,
+                                          int8_t *output,
                                           const AudioInterface::audioBitResolutionT targetBitResolution);
     /** \brief Convert a audioBitResolutionT bit resolution number into a
    * 32bit number (sample_t)
@@ -143,38 +143,54 @@ public:
    * appropriate size to hold the value. The caller is responsible to allocate
    * enough space to store the result.
    */
-    static void fromBitToSampleConversion(const int8_t* const input,
-                                          sample_t* output,
+    static void fromBitToSampleConversion(const int8_t *const input,
+                                          sample_t *output,
                                           const AudioInterface::audioBitResolutionT sourceBitResolution);
 
     //--------------SETTERS---------------------------------------------
     virtual void setNumInputChannels(int nchannels)
-    { mNumInChans = nchannels; }
+    {
+        mNumInChans = nchannels;
+    }
     virtual void setNumOutputChannels(int nchannels)
-    { mNumOutChans = nchannels; }
+    {
+        mNumOutChans = nchannels;
+    }
     virtual void setSampleRate(uint32_t sample_rate)
-    { mSampleRate = sample_rate; }
+    {
+        mSampleRate = sample_rate;
+    }
     virtual void setDeviceID(uint32_t device_id)
-    { mDeviceID = device_id; }
+    {
+        mDeviceID = device_id;
+    }
     virtual void setBufferSizeInSamples(uint32_t buf_size)
-    { mBufferSizeInSamples = buf_size; }
+    {
+        mBufferSizeInSamples = buf_size;
+    }
     /// \brief Set Client Name to something different that the default (JackTrip)
-    virtual void setClientName(const char* ClientName) = 0;
+    virtual void setClientName(const char *ClientName) = 0;
     //------------------------------------------------------------------
 
     //--------------GETTERS---------------------------------------------
     /// \brief Get Number of Input Channels
     virtual int getNumInputChannels() const { return mNumInChans; }
     /// \brief Get Number of Output Channels
-    virtual int getNumOutputChannels() const  { return mNumOutChans; }
+    virtual int getNumOutputChannels() const { return mNumOutChans; }
     virtual uint32_t getBufferSizeInSamples() const
-    { return mBufferSizeInSamples; }
+    {
+        return mBufferSizeInSamples;
+    }
     virtual uint32_t getDeviceID() const
-    { return mDeviceID; }
+    {
+        return mDeviceID;
+    }
     virtual size_t getSizeInBytesPerChannel() const;
     /// \brief Get the Jack Server Sampling Rate, in samples/second
     virtual uint32_t getSampleRate() const
-    { return mSampleRate; }
+    {
+        return mSampleRate;
+    }
     /// \brief Get the Jack Server Sampling Rate Enum Type samplingRateT
     /// \return  AudioInterface::samplingRateT enum type
     virtual samplingRateT getSampleRateType() const;
@@ -190,36 +206,39 @@ public:
    */
     static int getSampleRateFromType(samplingRateT rate_type);
     //------------------------------------------------------------------
-
+    virtual void setDigitalGain(int dg)
+    {
+        digitalGain = dg;
+    }
 
 private:
-
     /// \brief Compute the process to receive packets
-    void computeProcessFromNetwork(QVarLengthArray<sample_t*>& out_buffer,
+    void computeProcessFromNetwork(QVarLengthArray<sample_t *> &out_buffer,
                                    unsigned int n_frames);
     /// \brief Compute the process to send packets
-    void computeProcessToNetwork(QVarLengthArray<sample_t*>& in_buffer,
+    void computeProcessToNetwork(QVarLengthArray<sample_t *> &in_buffer,
                                  unsigned int n_frames);
 
-    JackTrip* mJackTrip; ///< JackTrip Mediator Class pointer
-    int mNumInChans;///< Number of Input Channels
-    int mNumOutChans; ///<  Number of Output Channels
-#ifdef WAIR // wair
-    int mNumNetRevChans; ///<  Number of Network Audio Channels (net comb filters)
-    QVarLengthArray<sample_t*> mNetInBuffer; ///< Vector of Input buffers/channel read from net
-    QVarLengthArray<sample_t*> mAPInBuffer; ///< Vector of Input buffers/channel for AllPass input
-#endif // endwhere
-    int mAudioBitResolution; ///< Bit resolution in audio samples
+    JackTrip *mJackTrip;                                    ///< JackTrip Mediator Class pointer
+    int mNumInChans;                                        ///< Number of Input Channels
+    int mNumOutChans;                                       ///<  Number of Output Channels
+#ifdef WAIR                                                 // wair
+    int mNumNetRevChans;                                    ///<  Number of Network Audio Channels (net comb filters)
+    QVarLengthArray<sample_t *> mNetInBuffer;               ///< Vector of Input buffers/channel read from net
+    QVarLengthArray<sample_t *> mAPInBuffer;                ///< Vector of Input buffers/channel for AllPass input
+#endif                                                      // endwhere
+    int mAudioBitResolution;                                ///< Bit resolution in audio samples
     AudioInterface::audioBitResolutionT mBitResolutionMode; ///< Bit resolution (audioBitResolutionT) mode
-    uint32_t mSampleRate; ///< Sampling Rate
-    uint32_t mDeviceID; ///< RTAudio DeviceID
-    uint32_t mBufferSizeInSamples; ///< Buffer size in samples
-    size_t mSizeInBytesPerChannel; ///< Size in bytes per audio channel
-    QVector<ProcessPlugin*> mProcessPlugins; ///< Vector of ProcesPlugin<EM>s</EM>
-    QVarLengthArray<sample_t*> mInProcessBuffer;///< Vector of Input buffers/channel for ProcessPlugin
-    QVarLengthArray<sample_t*> mOutProcessBuffer;///< Vector of Output buffers/channel for ProcessPlugin
-    int8_t* mInputPacket; ///< Packet containing all the channels to read from the RingBuffer
-    int8_t* mOutputPacket;  ///< Packet containing all the channels to send to the RingBuffer
+    uint32_t mSampleRate;                                   ///< Sampling Rate
+    uint32_t mDeviceID;                                     ///< RTAudio DeviceID
+    uint32_t mBufferSizeInSamples;                          ///< Buffer size in samples
+    size_t mSizeInBytesPerChannel;                          ///< Size in bytes per audio channel
+    QVector<ProcessPlugin *> mProcessPlugins;               ///< Vector of ProcesPlugin<EM>s</EM>
+    QVarLengthArray<sample_t *> mInProcessBuffer;           ///< Vector of Input buffers/channel for ProcessPlugin
+    QVarLengthArray<sample_t *> mOutProcessBuffer;          ///< Vector of Output buffers/channel for ProcessPlugin
+    int8_t *mInputPacket;                                   ///< Packet containing all the channels to read from the RingBuffer
+    int8_t *mOutputPacket;                                  ///< Packet containing all the channels to send to the RingBuffer
+    int digitalGain;
 };
 
 #endif // __AUDIOINTERFACE_H__

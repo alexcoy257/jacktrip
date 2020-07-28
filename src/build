@@ -38,5 +38,5 @@ else
     $QCMD -spec $QSPEC jacktrip.pro
     make clean
     $QCMD -spec $QSPEC jacktrip.pro
-    make release
+    make -j4 debug
 fi

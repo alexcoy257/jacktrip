@@ -69,52 +69,56 @@ class JackTrip : public QThread
     Q_OBJECT;
 
 public:
-
     //----------ENUMS------------------------------------------
     /// \brief Enum for the data Protocol. At this time only UDP is implemented
-    enum dataProtocolT {
+    enum dataProtocolT
+    {
         UDP, ///< Use UDP (User Datagram Protocol)
         TCP, ///< <B>NOT IMPLEMENTED</B>: Use TCP (Transmission Control Protocol)
         SCTP ///< <B>NOT IMPLEMENTED</B>: Use SCTP (Stream Control Transmission Protocol)
     };
 
     /// \brief Enum for the JackTrip mode
-    enum jacktripModeT {
-        SERVER, ///< Run in Server Mode
-        CLIENT,  ///< Run in Client Mode
+    enum jacktripModeT
+    {
+        SERVER,             ///< Run in Server Mode
+        CLIENT,             ///< Run in Client Mode
         CLIENTTOPINGSERVER, ///< Client of the Ping Server Mode
-        SERVERPINGSERVER ///< Server of the MultiThreaded JackTrip
+        SERVERPINGSERVER    ///< Server of the MultiThreaded JackTrip
     };
 
     /// \brief Enum for the JackTrip Underrun Mode, when packets
-    enum underrunModeT {
+    enum underrunModeT
+    {
         WAVETABLE, ///< Loops on the last received packet
-        ZEROS  ///< Set new buffers to zero if there are no new ones
+        ZEROS      ///< Set new buffers to zero if there are no new ones
     };
 
     /// \brief Enum for Audio Interface Mode
-    enum audiointerfaceModeT {
-        JACK, ///< Jack Mode
-        RTAUDIO  ///< RtAudio Mode
+    enum audiointerfaceModeT
+    {
+        JACK,   ///< Jack Mode
+        RTAUDIO ///< RtAudio Mode
     };
 
     /// \brief Enum for Connection Mode (in packet header)
-    enum connectionModeT {
-        NORMAL, ///< Normal Mode
-        KSTRONG,  ///< Karplus Strong
+    enum connectionModeT
+    {
+        NORMAL,  ///< Normal Mode
+        KSTRONG, ///< Karplus Strong
         JAMTEST  ///< Karplus Strong
     };
 
     /// \brief Enum for Hub Server Audio Connection Mode (connections to hub server are automatically patched in Jack)
-    enum hubConnectionModeT {
+    enum hubConnectionModeT
+    {
         SERVERTOCLIENT, ///< Normal Mode, Sever to All Clients (but not client to any client)
-        CLIENTECHO,  ///< Client Echo (client self-to-self)
-        CLIENTFOFI,  ///< Client Fan Out to Clients and Fan In from Clients (but not self-to-self)
-        RESERVEDMATRIX,  ///< Reserved for custom patch matrix (for TUB ensemble)
-        FULLMIX  ///< Client Fan Out to Clients and Fan In from Clients (including self-to-self)
+        CLIENTECHO,     ///< Client Echo (client self-to-self)
+        CLIENTFOFI,     ///< Client Fan Out to Clients and Fan In from Clients (but not self-to-self)
+        RESERVEDMATRIX, ///< Reserved for custom patch matrix (for TUB ensemble)
+        FULLMIX         ///< Client Fan Out to Clients and Fan In from Clients (including self-to-self)
     };
     //---------------------------------------------------------
-
 
     /** \brief The class Constructor with Default Parameters
    * \param JacktripMode JackTrip::CLIENT or JackTrip::SERVER
@@ -127,15 +131,15 @@ public:
     JackTrip(jacktripModeT JacktripMode = CLIENT,
              dataProtocolT DataProtocolType = UDP,
              int NumChans = gDefaultNumInChannels,
-         #ifdef WAIR // wair
+#ifdef WAIR // wair
              int NumNetRevChans = 0,
-         #endif // endwhere
+#endif // endwhere
              int BufferQueueLength = gDefaultQueueLength,
              unsigned int redundancy = gDefaultRedundancy,
              AudioInterface::audioBitResolutionT AudioBitResolution =
-            AudioInterface::BIT16,
+                 AudioInterface::BIT16,
              DataProtocol::packetHeaderTypeT PacketHeaderType =
-            DataProtocol::DEFAULT,
+                 DataProtocol::DEFAULT,
              underrunModeT UnderRunMode = WAVETABLE,
              int receiver_bind_port = gDefaultPort,
              int sender_bind_port = gDefaultPort,
@@ -146,25 +150,27 @@ public:
     virtual ~JackTrip();
 
     /// \brief Starting point for the thread
-    virtual void run() {
-        if (gVerboseFlag) std::cout << "Settings:startJackTrip before mJackTrip->run" << std::endl;
+    virtual void run()
+    {
+        if (gVerboseFlag)
+            std::cout << "Settings:startJackTrip before mJackTrip->run" << std::endl;
     }
 
     /// \brief Set the Peer Address for jacktripModeT::CLIENT mode only
-    virtual void setPeerAddress(const char* PeerHostOrIP);
+    virtual void setPeerAddress(const char *PeerHostOrIP);
 
     /** \brief Append a process plugin. Processes will be appended in order
    * \param plugin Pointer to ProcessPlugin Class
    */
     //void appendProcessPlugin(const std::tr1::shared_ptr<ProcessPlugin> plugin);
-    virtual void appendProcessPlugin(ProcessPlugin* plugin);
+    virtual void appendProcessPlugin(ProcessPlugin *plugin);
 
     /// \brief Start the processing threads
     virtual void startProcess(
-        #ifdef WAIRTOHUB // wair
-            int ID
-        #endif // endwhere
-            );
+#ifdef WAIRTOHUB // wair
+        int ID
+#endif // endwhere
+    );
 
     /// \brief Stop the processing threads
     virtual void stop();
@@ -183,10 +189,14 @@ public:
     //
     /// \brief Sets (override) JackTrip Mode after construction
     virtual void setJackTripMode(jacktripModeT JacktripMode)
-    { mJackTripMode = JacktripMode; }
+    {
+        mJackTripMode = JacktripMode;
+    }
     /// \brief Sets (override) DataProtocol Type after construction
     virtual void setDataProtocoType(dataProtocolT DataProtocolType)
-    { mDataProtocol = DataProtocolType; }
+    {
+        mDataProtocol = DataProtocolType;
+    }
     /// \brief Sets the Packet header type
     virtual void setPacketHeaderType(DataProtocol::packetHeaderTypeT PacketHeaderType)
     {
@@ -197,13 +207,19 @@ public:
     }
     /// \brief Sets (override) Buffer Queue Length Mode after construction
     virtual void setBufferQueueLength(int BufferQueueLength)
-    { mBufferQueueLength = BufferQueueLength; }
+    {
+        mBufferQueueLength = BufferQueueLength;
+    }
     /// \brief Sets (override) Audio Bit Resolution after construction
     virtual void setAudioBitResolution(AudioInterface::audioBitResolutionT AudioBitResolution)
-    { mAudioBitResolution = AudioBitResolution; }
+    {
+        mAudioBitResolution = AudioBitResolution;
+    }
     /// \brief Sets (override) Underrun Mode
     virtual void setUnderRunMode(underrunModeT UnderRunMode)
-    { mUnderRunMode = UnderRunMode; }
+    {
+        mUnderRunMode = UnderRunMode;
+    }
     /// \brief Sets port numbers for the local and peer machine.
     /// Receive port is <tt>port</tt>
     virtual void setAllPorts(int port)
@@ -226,173 +242,284 @@ public:
         mReceiverPeerPort = port;
     }
     /// \brief Set Client Name to something different that the default (JackTrip)
-    virtual void setClientName(const char* ClientName)
-    { mJackClientName = ClientName; }
+    virtual void setClientName(const char *ClientName)
+    {
+        mJackClientName = ClientName;
+    }
     /// \brief Set the number of audio channels
     virtual void setNumChannels(int num_chans)
-    { mNumChans = num_chans; }
+    {
+        mNumChans = num_chans;
+    }
 
     /// Set to connect or not default audio ports (only implemented in Jack)
     virtual void setConnectDefaultAudioPorts(bool connect)
-    {mConnectDefaultAudioPorts = connect;}
+    {
+        mConnectDefaultAudioPorts = connect;
+    }
+
+    virtual void setDigitalGain(int dg)
+    {
+        mAudioInterface->setDigitalGain(dg);
+    }
 
     virtual int getReceiverBindPort() const
-    { return mReceiverBindPort; }
+    {
+        return mReceiverBindPort;
+    }
     virtual int getSenderPeerPort() const
-    { return mSenderPeerPort; }
+    {
+        return mSenderPeerPort;
+    }
     virtual int getSenderBindPort() const
-    { return mSenderBindPort; }
+    {
+        return mSenderBindPort;
+    }
     virtual int getReceiverPeerPort() const
-    { return mReceiverPeerPort; }
+    {
+        return mReceiverPeerPort;
+    }
 
-    virtual DataProtocol* getDataProtocolSender() const
-    { return mDataProtocolSender; }
-    virtual DataProtocol* getDataProtocolReceiver() const
-    { return mDataProtocolReceiver; }
-    virtual void setDataProtocolSender(DataProtocol* const DataProtocolSender)
-    { mDataProtocolSender = DataProtocolSender; }
-    virtual void setDataProtocolReceiver(DataProtocol* const DataProtocolReceiver)
-    { mDataProtocolReceiver = DataProtocolReceiver; }
+    virtual DataProtocol *getDataProtocolSender() const
+    {
+        return mDataProtocolSender;
+    }
+    virtual DataProtocol *getDataProtocolReceiver() const
+    {
+        return mDataProtocolReceiver;
+    }
+    virtual void setDataProtocolSender(DataProtocol *const DataProtocolSender)
+    {
+        mDataProtocolSender = DataProtocolSender;
+    }
+    virtual void setDataProtocolReceiver(DataProtocol *const DataProtocolReceiver)
+    {
+        mDataProtocolReceiver = DataProtocolReceiver;
+    }
 
-    virtual RingBuffer* getSendRingBuffer() const
-    { return mSendRingBuffer; }
-    virtual RingBuffer* getReceiveRingBuffer() const
-    { return mReceiveRingBuffer; }
-    virtual void setSendRingBuffer(RingBuffer* const SendRingBuffer)
-    { mSendRingBuffer = SendRingBuffer; }
-    virtual void setReceiveRingBuffer(RingBuffer* const ReceiveRingBuffer)
-    { mReceiveRingBuffer = ReceiveRingBuffer; }
+    virtual RingBuffer *getSendRingBuffer() const
+    {
+        return mSendRingBuffer;
+    }
+    virtual RingBuffer *getReceiveRingBuffer() const
+    {
+        return mReceiveRingBuffer;
+    }
+    virtual void setSendRingBuffer(RingBuffer *const SendRingBuffer)
+    {
+        mSendRingBuffer = SendRingBuffer;
+    }
+    virtual void setReceiveRingBuffer(RingBuffer *const ReceiveRingBuffer)
+    {
+        mReceiveRingBuffer = ReceiveRingBuffer;
+    }
 
-    virtual void setPacketHeader(PacketHeader* const PacketHeader)
-    { mPacketHeader = PacketHeader; }
+    virtual void setPacketHeader(PacketHeader *const PacketHeader)
+    {
+        mPacketHeader = PacketHeader;
+    }
 
     virtual int getRingBuffersSlotSize()
-    { return getTotalAudioPacketSizeInBytes(); }
+    {
+        return getTotalAudioPacketSizeInBytes();
+    }
 
     virtual void setAudiointerfaceMode(JackTrip::audiointerfaceModeT audiointerface_mode)
-    { mAudiointerfaceMode = audiointerface_mode; }
-    virtual void setAudioInterface(AudioInterface* const AudioInterface)
-    { mAudioInterface = AudioInterface; }
-
+    {
+        mAudiointerfaceMode = audiointerface_mode;
+    }
+    virtual void setAudioInterface(AudioInterface *const AudioInterface)
+    {
+        mAudioInterface = AudioInterface;
+    }
 
     void setSampleRate(uint32_t sample_rate)
-    { mSampleRate = sample_rate; }
+    {
+        mSampleRate = sample_rate;
+    }
     void setDeviceID(uint32_t device_id)
-    { mDeviceID = device_id; }
+    {
+        mDeviceID = device_id;
+    }
     void setAudioBufferSizeInSamples(uint32_t buf_size)
-    { mAudioBufferSize = buf_size; }
-
+    {
+        mAudioBufferSize = buf_size;
+    }
 
     JackTrip::connectionModeT getConnectionMode() const
-    { return mConnectionMode; }
+    {
+        return mConnectionMode;
+    }
     void setConnectionMode(JackTrip::connectionModeT connection_mode)
-    { mConnectionMode = connection_mode; }
+    {
+        mConnectionMode = connection_mode;
+    }
 
     JackTrip::hubConnectionModeT getHubConnectionModeT() const
-    { return mHubConnectionModeT; }
+    {
+        return mHubConnectionModeT;
+    }
     void setHubConnectionModeT(JackTrip::hubConnectionModeT connection_mode)
-    { mHubConnectionModeT = connection_mode; }
+    {
+        mHubConnectionModeT = connection_mode;
+    }
 
     JackTrip::jacktripModeT getJackTripMode() const
-    { return mJackTripMode; }
+    {
+        return mJackTripMode;
+    }
 
     QString getPeerAddress() const
-    { return mPeerAddress; }
+    {
+        return mPeerAddress;
+    }
 
     bool receivedConnectionFromPeer()
-    { return mReceivedConnection; }
+    {
+        return mReceivedConnection;
+    }
 
     bool tcpConnectionError()
-    { return mTcpConnectionError; }
+    {
+        return mTcpConnectionError;
+    }
     //@}
     //------------------------------------------------------------------------------------
-
 
     //------------------------------------------------------------------------------------
     /// \name Mediator Functions
     //@{
     /// \todo Document all these functions
     virtual void createHeader(const DataProtocol::packetHeaderTypeT headertype);
-    void putHeaderInPacket(int8_t* full_packet, int8_t* audio_packet);
+    void putHeaderInPacket(int8_t *full_packet, int8_t *audio_packet);
     virtual int getPacketSizeInBytes();
-    void parseAudioPacket(int8_t* full_packet, int8_t* audio_packet);
-    virtual void sendNetworkPacket(const int8_t* ptrToSlot)
-    { mSendRingBuffer->insertSlotNonBlocking(ptrToSlot); }
-    virtual void receiveNetworkPacket(int8_t* ptrToReadSlot)
-    { mReceiveRingBuffer->readSlotNonBlocking(ptrToReadSlot); }
-    virtual void readAudioBuffer(int8_t* ptrToReadSlot)
-    { mSendRingBuffer->readSlotBlocking(ptrToReadSlot); }
-    virtual void writeAudioBuffer(const int8_t* ptrToSlot)
-    { mReceiveRingBuffer->insertSlotNonBlocking(ptrToSlot); }
+    void parseAudioPacket(int8_t *full_packet, int8_t *audio_packet);
+    virtual void sendNetworkPacket(const int8_t *ptrToSlot)
+    {
+        mSendRingBuffer->insertSlotNonBlocking(ptrToSlot);
+    }
+    virtual void receiveNetworkPacket(int8_t *ptrToReadSlot)
+    {
+        mReceiveRingBuffer->readSlotNonBlocking(ptrToReadSlot);
+    }
+    virtual void readAudioBuffer(int8_t *ptrToReadSlot)
+    {
+        mSendRingBuffer->readSlotBlocking(ptrToReadSlot);
+    }
+    virtual void writeAudioBuffer(const int8_t *ptrToSlot)
+    {
+        mReceiveRingBuffer->insertSlotNonBlocking(ptrToSlot);
+    }
     uint32_t getBufferSizeInSamples() const
-    { return mAudioBufferSize; /*return mAudioInterface->getBufferSizeInSamples();*/ }
+    {
+        return mAudioBufferSize; /*return mAudioInterface->getBufferSizeInSamples();*/
+    }
     uint32_t getDeviceID() const
-    { return mDeviceID; /*return mAudioInterface->mDeviceID();*/ }
+    {
+        return mDeviceID; /*return mAudioInterface->mDeviceID();*/
+    }
 
     AudioInterface::samplingRateT getSampleRateType() const
-    { return mAudioInterface->getSampleRateType(); }
+    {
+        return mAudioInterface->getSampleRateType();
+    }
     int getSampleRate() const
-    { return mSampleRate; /*return mAudioInterface->getSampleRate();*/ }
+    {
+        return mSampleRate; /*return mAudioInterface->getSampleRate();*/
+    }
 
     uint8_t getAudioBitResolution() const
-    { return mAudioBitResolution*8; /*return mAudioInterface->getAudioBitResolution();*/ }
+    {
+        return mAudioBitResolution * 8; /*return mAudioInterface->getAudioBitResolution();*/
+    }
     unsigned int getNumInputChannels() const
-    { return mNumChans; /*return mAudioInterface->getNumInputChannels();*/ }
+    {
+        return mNumChans; /*return mAudioInterface->getNumInputChannels();*/
+    }
     unsigned int getNumOutputChannels() const
-    { return mNumChans; /*return mAudioInterface->getNumOutputChannels();*/ }
+    {
+        return mNumChans; /*return mAudioInterface->getNumOutputChannels();*/
+    }
     unsigned int getNumChannels() const
     {
         if (getNumInputChannels() == getNumOutputChannels())
-        { return getNumInputChannels(); }
-        else { return 0; }
+        {
+            return getNumInputChannels();
+        }
+        else
+        {
+            return 0;
+        }
     }
-    virtual void checkPeerSettings(int8_t* full_packet);
+    virtual void checkPeerSettings(int8_t *full_packet);
     void increaseSequenceNumber()
-    { mPacketHeader->increaseSequenceNumber(); }
+    {
+        mPacketHeader->increaseSequenceNumber();
+    }
     int getSequenceNumber() const
-    { return mPacketHeader->getSequenceNumber(); }
+    {
+        return mPacketHeader->getSequenceNumber();
+    }
 
-    uint64_t getPeerTimeStamp(int8_t* full_packet) const
-    { return mPacketHeader->getPeerTimeStamp(full_packet); }
+    uint64_t getPeerTimeStamp(int8_t *full_packet) const
+    {
+        return mPacketHeader->getPeerTimeStamp(full_packet);
+    }
 
-    uint16_t getPeerSequenceNumber(int8_t* full_packet) const
-    { return mPacketHeader->getPeerSequenceNumber(full_packet); }
+    uint16_t getPeerSequenceNumber(int8_t *full_packet) const
+    {
+        return mPacketHeader->getPeerSequenceNumber(full_packet);
+    }
 
-    uint16_t getPeerBufferSize(int8_t* full_packet) const
-    { return mPacketHeader->getPeerBufferSize(full_packet); }
+    uint16_t getPeerBufferSize(int8_t *full_packet) const
+    {
+        return mPacketHeader->getPeerBufferSize(full_packet);
+    }
 
-    uint8_t getPeerSamplingRate(int8_t* full_packet) const
-    { return mPacketHeader->getPeerSamplingRate(full_packet); }
+    uint8_t getPeerSamplingRate(int8_t *full_packet) const
+    {
+        return mPacketHeader->getPeerSamplingRate(full_packet);
+    }
 
-    uint8_t getPeerBitResolution(int8_t* full_packet) const
-    { return mPacketHeader->getPeerBitResolution(full_packet); }
+    uint8_t getPeerBitResolution(int8_t *full_packet) const
+    {
+        return mPacketHeader->getPeerBitResolution(full_packet);
+    }
 
-    uint8_t  getPeerNumChannels(int8_t* full_packet) const
-    { return mPacketHeader->getPeerNumChannels(full_packet); }
+    uint8_t getPeerNumChannels(int8_t *full_packet) const
+    {
+        return mPacketHeader->getPeerNumChannels(full_packet);
+    }
 
-    uint8_t  getPeerConnectionMode(int8_t* full_packet) const
-    { return mPacketHeader->getPeerConnectionMode(full_packet); }
+    uint8_t getPeerConnectionMode(int8_t *full_packet) const
+    {
+        return mPacketHeader->getPeerConnectionMode(full_packet);
+    }
 
     size_t getSizeInBytesPerChannel() const
-    { return mAudioInterface->getSizeInBytesPerChannel(); }
+    {
+        return mAudioInterface->getSizeInBytesPerChannel();
+    }
     int getHeaderSizeInBytes() const
-    { return mPacketHeader->getHeaderSizeInBytes(); }
+    {
+        return mPacketHeader->getHeaderSizeInBytes();
+    }
     virtual int getTotalAudioPacketSizeInBytes() const
     {
 #ifdef WAIR // WAIR
         if (mNumNetRevChans)
             return mAudioInterface->getSizeInBytesPerChannel() * mNumNetRevChans;
         else // not wair
-#endif // endwhere
+#endif       // endwhere
             return mAudioInterface->getSizeInBytesPerChannel() * mNumChans;
     }
     //@}
     //------------------------------------------------------------------------------------
 
-    void printTextTest() {std::cout << "=== JackTrip PRINT ===" << std::endl;}
-    void printTextTest2() {std::cout << "=== JackTrip PRINT2 ===" << std::endl;}
+    void printTextTest() { std::cout << "=== JackTrip PRINT ===" << std::endl; }
+    void printTextTest2() { std::cout << "=== JackTrip PRINT2 ===" << std::endl; }
 
-    void startIOStatTimer(int timeout_sec, const std::ostream& log_stream);
+    void startIOStatTimer(int timeout_sec, const std::ostream &log_stream);
 
 public slots:
     /// \brief Slot to stop all the processes and threads
@@ -411,17 +538,21 @@ public slots:
     void slotUdpWaitingTooLongClientGoneProbably(int wait_msec)
     {
         int wait_time = 10000; // msec
-        if ( !(wait_msec%wait_time) ) {
+        if (!(wait_msec % wait_time))
+        {
             std::cerr << "UDP WAITED MORE THAN 10 seconds." << std::endl;
             emit signalNoUdpPacketsForSeconds();
         }
     }
     void slotPrintTest()
-    { std::cout << "=== TESTING ===" << std::endl; }
+    {
+        std::cout << "=== TESTING ===" << std::endl;
+    }
     void slotReceivedConnectionFromPeer()
-    { mReceivedConnection = true; }
+    {
+        mReceivedConnection = true;
+    }
     void onStatTimer();
-
 
 signals:
 
@@ -432,15 +563,13 @@ signals:
     void signalNoUdpPacketsForSeconds();
     void signalTcpClientConnected();
 
-
 public:
-
     /// \brief Set the AudioInteface object
     virtual void setupAudio(
-        #ifdef WAIRTOHUB // WAIR
-            int ID
-        #endif // endwhere
-            );
+#ifdef WAIRTOHUB // WAIR
+        int ID
+#endif // endwhere
+    );
     /// \brief Close the JackAudioInteface and disconnects it from JACK
     void closeAudio();
     /// \brief Set the DataProtocol objects
@@ -463,49 +592,48 @@ private:
     //                       QHostAddress PeerHostAddress, int peer_port)
     //throw(std::runtime_error);
 
-
-    jacktripModeT mJackTripMode; ///< JackTrip::jacktripModeT
-    dataProtocolT mDataProtocol; ///< Data Protocol Tipe
+    jacktripModeT mJackTripMode;                       ///< JackTrip::jacktripModeT
+    dataProtocolT mDataProtocol;                       ///< Data Protocol Tipe
     DataProtocol::packetHeaderTypeT mPacketHeaderType; ///< Packet Header Type
     JackTrip::audiointerfaceModeT mAudiointerfaceMode;
 
-    int mNumChans; ///< Number of Channels (inputs = outputs)
-#ifdef WAIR // WAIR
-    int mNumNetRevChans; ///< Number of Network Audio Channels (net comb filters)
-#endif // endwhere
-    int mBufferQueueLength; ///< Audio Buffer from network queue length
-    uint32_t mSampleRate; ///< Sample Rate
-    uint32_t mDeviceID; ///< RTAudio DeviceID
-    uint32_t mAudioBufferSize; ///< Audio buffer size to process on each callback
+    int mNumChans;                                           ///< Number of Channels (inputs = outputs)
+#ifdef WAIR                                                  // WAIR
+    int mNumNetRevChans;                                     ///< Number of Network Audio Channels (net comb filters)
+#endif                                                       // endwhere
+    int mBufferQueueLength;                                  ///< Audio Buffer from network queue length
+    uint32_t mSampleRate;                                    ///< Sample Rate
+    uint32_t mDeviceID;                                      ///< RTAudio DeviceID
+    uint32_t mAudioBufferSize;                               ///< Audio buffer size to process on each callback
     AudioInterface::audioBitResolutionT mAudioBitResolution; ///< Audio Bit Resolutions
-    QString mPeerAddress; ///< Peer Address to use in jacktripModeT::CLIENT Mode
+    QString mPeerAddress;                                    ///< Peer Address to use in jacktripModeT::CLIENT Mode
 
     /// Pointer to Abstract Type DataProtocol that sends packets
-    DataProtocol* mDataProtocolSender;
+    DataProtocol *mDataProtocolSender;
     /// Pointer to Abstract Type DataProtocol that receives packets
-    DataProtocol* mDataProtocolReceiver;
-    AudioInterface* mAudioInterface; ///< Interface to Jack Client
-    PacketHeader* mPacketHeader; ///< Pointer to Packet Header
-    underrunModeT mUnderRunMode; ///< underrunModeT Mode
+    DataProtocol *mDataProtocolReceiver;
+    AudioInterface *mAudioInterface; ///< Interface to Jack Client
+    PacketHeader *mPacketHeader;     ///< Pointer to Packet Header
+    underrunModeT mUnderRunMode;     ///< underrunModeT Mode
 
     /// Pointer for the Send RingBuffer
-    RingBuffer* mSendRingBuffer;
+    RingBuffer *mSendRingBuffer;
     /// Pointer for the Receive RingBuffer
-    RingBuffer* mReceiveRingBuffer;
+    RingBuffer *mReceiveRingBuffer;
 
     int mReceiverBindPort; ///< Incoming (receiving) port for local machine
-    int mSenderPeerPort; ///< Incoming (receiving) port for peer machine
-    int mSenderBindPort; ///< Outgoing (sending) port for local machine
+    int mSenderPeerPort;   ///< Incoming (receiving) port for peer machine
+    int mSenderBindPort;   ///< Outgoing (sending) port for local machine
     int mReceiverPeerPort; ///< Outgoing (sending) port for peer machine
     int mTcpServerPort;
 
-    unsigned int mRedundancy; ///< Redundancy factor in network data
-    const char* mJackClientName; ///< JackAudio Client Name
+    unsigned int mRedundancy;    ///< Redundancy factor in network data
+    const char *mJackClientName; ///< JackAudio Client Name
 
-    JackTrip::connectionModeT mConnectionMode; ///< Connection Mode
+    JackTrip::connectionModeT mConnectionMode;        ///< Connection Mode
     JackTrip::hubConnectionModeT mHubConnectionModeT; ///< Hub Server Jack Audio Patch Connection Mode
 
-    QVector<ProcessPlugin*> mProcessPlugins; ///< Vector of ProcesPlugin<EM>s</EM>
+    QVector<ProcessPlugin *> mProcessPlugins; ///< Vector of ProcesPlugin<EM>s</EM>
 
     volatile bool mReceivedConnection; ///< Bool of received connection from peer
     volatile bool mTcpConnectionError;
