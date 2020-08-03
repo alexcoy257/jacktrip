@@ -54,6 +54,9 @@
 
 #include "ThreadPoolTest.h"
 
+#include <string>
+#include <regex>
+
 using std::cout;
 using std::endl;
 
@@ -377,11 +380,21 @@ void Settings::parseInput(int argc, char **argv)
             printUsage();
             std::exit(0);
             break;
-        case 'g':
+        case 'g': {
             //-------------------------------------------------------
+            std::string parts = "";
+            int position = parts.find (':');
+            std::regex listen_valid = std::regex("l-?[0-9]*");
+            if (parts.find (':') == std::string::npos){
+
+            }
+            else{
+
+            }
             digitalGain = atoi(optarg);
-            cout << "Tried to set gain";
-            break;
+            cout << "Optional argument was " <<optarg <<std::endl;
+            cout << "Tried to set gain to " <<digitalGain << std::endl;
+            break;}
         default:
             //-------------------------------------------------------
             printUsage();

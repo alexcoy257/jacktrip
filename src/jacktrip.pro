@@ -98,8 +98,11 @@ win32 {
 #cc  CONFIG += x86 console
   CONFIG += c++11 console
   INCLUDEPATH += "C:\Program Files (x86)\Jack\includes"
-  LIBS += "C:\Program Files (x86)\Jack\lib\libjack64.lib"
-  LIBS += "C:\Program Files (x86)\Jack\lib\libjackserver64.lib"
+  #LIBS += "C:\Program Files (x86)\Jack\lib\libjack64.lib"
+  #LIBS += "C:\Program Files (x86)\Jack\lib\libjack64.lib"
+  #QMAKE_LFLAGS += -llibjack64
+  #LIBS += "C:\Program Files (x86)\Jack\lib\libjackserver64.lib"
+  LIBS += -L"C:\Program Files (x86)\Jack\lib" -llibjack64 -llibjackserver64
 #cc  QMAKE_CXXFLAGS += -D__WINDOWS_ASIO__ #-D__UNIX_JACK__ #RtAudio Flags
   #QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++ -lpthread
   LIBS += -lWs2_32 #cc -lOle32 #needed by rtaudio/asio
@@ -136,7 +139,8 @@ HEADERS += DataProtocol.h \
            ThreadPoolTest.h \
            UdpDataProtocol.h \
            UdpHubListener.h \
-           AudioInterface.h
+           AudioInterface.h \
+           keyboardhandler.h
 
 !nojack {
 HEADERS += JackAudioInterface.h
@@ -156,7 +160,8 @@ SOURCES += DataProtocol.cpp \
            Settings.cpp \
            UdpDataProtocol.cpp \
            UdpHubListener.cpp \
-           AudioInterface.cpp
+           AudioInterface.cpp \
+           keyboardhandler.cpp
 
 !nojack {
 SOURCES += JackAudioInterface.cpp
@@ -173,3 +178,7 @@ DEPENDPATH += ../externals/rtaudio-4.1.1/
 HEADERS +=
 SOURCES +=
 }
+
+#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../../../../Program Files (x86)/Jack/lib/' -llibjack64
+#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../../../../Program Files (x86)/Jack/lib/' -llibjack64
+#else:unix: LIBS += -L$$PWD/'../../../../../Program Files (x86)/Jack/lib/' -llibjack64
