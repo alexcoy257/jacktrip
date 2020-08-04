@@ -410,9 +410,10 @@ void AudioInterface::computeProcessFromNetwork(QVarLengthArray<sample_t *> &out_
             //--------
             sample_t *tmp_sample = out_buffer[i]; //sample buffer for channel i
             //std::cout << "listenGain is " << listenGain << std::endl;
-            *tmp_sample = listenGain * *tmp_sample;
+            //*tmp_sample = listenGain * *tmp_sample;
             for (unsigned int j = 0; j < n_frames; j++)
             {
+                tmp_sample[j] *= listenGain;
                 // Change the bit resolution on each sample
                 fromBitToSampleConversion(
                     &mOutputPacket[(i * mSizeInBytesPerChannel) + (j * mBitResolutionMode)],
@@ -467,6 +468,7 @@ void AudioInterface::computeProcessToNetwork(QVarLengthArray<sample_t *> &in_buf
                 // Change the bit resolution on each sample
                 // Add the input jack buffer to the buffer resulting from the output process
                 tmp_result = speakGain * tmp_sample[j] + tmp_process_sample[j];
+                //std::cout << "Temp result " << tmp_result << "\n";
                 fromSampleToBitConversion(
                     &tmp_result,
                     &mInputPacket[(i * mSizeInBytesPerChannel) + (j * mBitResolutionMode)],
