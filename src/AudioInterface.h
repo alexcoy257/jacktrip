@@ -41,6 +41,8 @@
 #include "ProcessPlugin.h"
 #include "jacktrip_types.h"
 
+#include "JackTrip.h"
+
 #include <QVarLengthArray>
 #include <QVector>
 //#include "jacktrip_globals.h"
@@ -206,9 +208,10 @@ public:
    */
     static int getSampleRateFromType(samplingRateT rate_type);
     //------------------------------------------------------------------
-    virtual void setDigitalGain(int dg)
+    virtual void setDigitalGain(double lg, double sg)
     {
-        digitalGain = dg;
+        listenGain = lg;
+        speakGain = sg;
     }
 
 private:
@@ -238,7 +241,8 @@ private:
     QVarLengthArray<sample_t *> mOutProcessBuffer;          ///< Vector of Output buffers/channel for ProcessPlugin
     int8_t *mInputPacket;                                   ///< Packet containing all the channels to read from the RingBuffer
     int8_t *mOutputPacket;                                  ///< Packet containing all the channels to send to the RingBuffer
-    int digitalGain;
+    double speakGain;
+    double listenGain;
 };
 
 #endif // __AUDIOINTERFACE_H__

@@ -139,8 +139,7 @@ HEADERS += DataProtocol.h \
            ThreadPoolTest.h \
            UdpDataProtocol.h \
            UdpHubListener.h \
-           AudioInterface.h \
-           keyboardhandler.h
+           AudioInterface.h
 
 !nojack {
 HEADERS += JackAudioInterface.h
@@ -160,8 +159,7 @@ SOURCES += DataProtocol.cpp \
            Settings.cpp \
            UdpDataProtocol.cpp \
            UdpHubListener.cpp \
-           AudioInterface.cpp \
-           keyboardhandler.cpp
+           AudioInterface.cpp
 
 !nojack {
 SOURCES += JackAudioInterface.cpp
@@ -178,7 +176,3 @@ DEPENDPATH += ../externals/rtaudio-4.1.1/
 HEADERS +=
 SOURCES +=
 }
-
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../../../../Program Files (x86)/Jack/lib/' -llibjack64
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../../../../Program Files (x86)/Jack/lib/' -llibjack64
-#else:unix: LIBS += -L$$PWD/'../../../../../Program Files (x86)/Jack/lib/' -llibjack64

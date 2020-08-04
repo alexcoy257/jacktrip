@@ -36,7 +36,7 @@
  */
 
 #include "AudioInterface.h"
-#include "JackTrip.h"
+
 #include <iostream>
 #include <cmath>
 
@@ -57,7 +57,7 @@ AudioInterface::AudioInterface(JackTrip *jacktrip,
                                                                          mAudioBitResolution(AudioBitResolution * 8),
                                                                          mBitResolutionMode(AudioBitResolution),
                                                                          mSampleRate(gDefaultSampleRate), mBufferSizeInSamples(gDefaultBufferSizeInSamples),
-                                                                         mInputPacket(NULL), mOutputPacket(NULL), digitalGain(1)
+                                                                         mInputPacket(NULL), mOutputPacket(NULL), listenGain(1.0), speakGain(1.0)
 {
 #ifndef WAIR
     //cc
@@ -463,7 +463,7 @@ void AudioInterface::computeProcessToNetwork(QVarLengthArray<sample_t *> &in_buf
             {
                 // Change the bit resolution on each sample
                 // Add the input jack buffer to the buffer resulting from the output process
-                tmp_result = digitalGain * tmp_sample[j] + tmp_process_sample[j];
+                tmp_result = speakGain * tmp_sample[j] + tmp_process_sample[j];
                 fromSampleToBitConversion(
                     &tmp_result,
                     &mInputPacket[(i * mSizeInBytesPerChannel) + (j * mBitResolutionMode)],

@@ -119,7 +119,8 @@ private:
     bool mConnectDefaultAudioPorts; ///< Connect or not jack audio ports
     int mIOStatTimeout;
     std::ofstream mIOStatStream;
-    int digitalGain;
+    double listenGain;
+    double speakGain;
 };
 
 #endif

@@ -89,7 +89,8 @@ Settings::Settings() : mJackTrip(NULL),
                        mHubConnectionMode(JackTrip::SERVERTOCLIENT),
                        mConnectDefaultAudioPorts(true),
                        mIOStatTimeout(0),
-                       digitalGain(1)
+                       listenGain(1.0),
+                       speakGain(1.0)
 {
 }
 
@@ -380,21 +381,41 @@ void Settings::parseInput(int argc, char **argv)
             printUsage();
             std::exit(0);
             break;
-        case 'g': {
+        case 'g':
+        {
             //-------------------------------------------------------
-            std::string parts = "";
-            int position = parts.find (':');
-            std::regex listen_valid = std::regex("l-?[0-9]*");
-            if (parts.find (':') == std::string::npos){
+            std::regex listen_regex = std::regex("l(-?[0-9][0-9]*)");
+            std::regex speak_regex = std::regex("s(-?[0-9][0-9]*)");
+            std::smatch base_match;
 
+            if (std::regex_search(optarg, base_match, listen_regex))
+            {
+                if (base_match.size() == 2)
+                {
+                    std::ssub_match base_sub_match = base_match[1];
+                    std::string base = base_sub_match.str();
+                    int dbGain = std::stod(base);
+                    listenGain = std::exp(std::log(10) * dbGain / 20.0);
+                    std::cout << "Captured listen of " << base << " dB = "
+                              << listenGain << '\n';
+                }
             }
-            else{
+            std::smatch speak_match;
+            if (std::regex_search(optarg, speak_match, speak_regex))
+            {
+                if (speak_match.size() == 2)
+                {
+                    std::ssub_match base_sub_match = speak_match[1];
+                    std::string base = base_sub_match.str();
+                    int dbGain = std::stod(base);
+                    speakGain = std::exp(std::log(10) * dbGain / 20.0);
+                    std::cout << "Captured speak of " << base << " dB = "
+                              << speakGain << '\n';
+                }
+            }
 
-            }
-            digitalGain = atoi(optarg);
-            cout << "Optional argument was " <<optarg <<std::endl;
-            cout << "Tried to set gain to " <<digitalGain << std::endl;
-            break;}
+            break;
+        }
         default:
             //-------------------------------------------------------
             printUsage();
@@ -621,11 +642,7 @@ void Settings::startJackTrip()
             mJackTrip->setAudioBufferSizeInSamples(mAudioBufferSize);
         }
 
-        if (digitalGain > 0)
-        {
-            mJackTrip->setDigitalGain(digitalGain);
-            cout << "Digital gain set to " << digitalGain;
-        }
+        mJackTrip->setDigitalGain(listenGain, speakGain);
 
         // Add Plugins
         if (mLoopBack)

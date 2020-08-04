@@ -63,6 +63,12 @@
  * This class also acts as a Mediator between all the other class.
  * Classes that uses JackTrip methods need to register with it.
  */
+/*
+typedef struct digitalGain_t
+{
+    double listenGain;
+    double speakGain;
+} digitalGain_t;*/
 
 class JackTrip : public QThread
 {
@@ -258,9 +264,10 @@ public:
         mConnectDefaultAudioPorts = connect;
     }
 
-    virtual void setDigitalGain(int dg)
+    virtual void setDigitalGain(double lg, double sg)
     {
-        digitalGain = dg;
+        listenGain = lg;
+        speakGain = sg;
     }
 
     virtual int getReceiverBindPort() const
@@ -331,7 +338,7 @@ public:
     virtual void setAudioInterface(AudioInterface *const AudioInterface)
     {
         mAudioInterface = AudioInterface;
-        mAudioInterface->setDigitalGain(digitalGain);
+        mAudioInterface->setDigitalGain(listenGain, speakGain);
     }
 
     void setSampleRate(uint32_t sample_rate)
@@ -642,7 +649,8 @@ private:
 
     bool mConnectDefaultAudioPorts; ///< Connect or not default audio ports
     std::ostream mIOStatLogStream;
-    int digitalGain;
+    double listenGain;
+    double speakGain;
 };
 
 #endif

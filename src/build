@@ -39,6 +39,6 @@ if [[ $1 == 'nojack' ]]; then
 else
     $QCMD -spec $QSPEC ../src/jacktrip.pro
     make clean
-    $QCMD -spec $QSPEC jacktrip.pro
+    $QCMD -spec $QSPEC ../src/jacktrip.pro
     make -j4 release
 fi

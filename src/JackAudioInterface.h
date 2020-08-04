@@ -35,7 +35,6 @@
  * \date June 2008
  */
 
-
 #ifndef __JACKAUDIOINTERFACE_H__
 #define __JACKAUDIOINTERFACE_H__
 
@@ -48,13 +47,11 @@
 #include <QVarLengthArray>
 #include <QMutex>
 
-
 #include "jacktrip_types.h"
 #include "ProcessPlugin.h"
 #include "AudioInterface.h"
 
 //class JackTrip; //forward declaration
-
 
 /** \brief Class that provides an interface with the Jack Audio Server
  *
@@ -64,7 +61,6 @@
 class JackAudioInterface : public AudioInterface
 {
 public:
-
     /** \brief The class constructor
    * \param jacktrip Pointer to the JackTrip class that connects all classes (mediator)
    * \param NumInChans Number of Input Channels
@@ -72,13 +68,13 @@ public:
    * \param AudioBitResolution Audio Sample Resolutions in bits
    * \param ClientName Client name in Jack
    */
-    JackAudioInterface(JackTrip* jacktrip,
+    JackAudioInterface(JackTrip *jacktrip,
                        int NumInChans, int NumOutChans,
-                   #ifdef WAIR // wair
+#ifdef WAIR // wair
                        int NumNetRevChans,
-                   #endif // endwhere
+#endif // endwhere
                        AudioInterface::audioBitResolutionT AudioBitResolution = AudioInterface::BIT16,
-                       const char* ClientName = "JackTrip");
+                       const char *ClientName = "JackTrip");
     /// \brief The class destructor
     virtual ~JackAudioInterface();
 
@@ -98,12 +94,18 @@ public:
 
     //--------------SETTERS---------------------------------------------
     /// \brief Set Client Name to something different that the default (JackTrip)
-    virtual void setClientName(const char* ClientName)
-    { mClientName = ClientName; }
+    virtual void setClientName(const char *ClientName)
+    {
+        mClientName = ClientName;
+    }
     virtual void setSampleRate(uint32_t /*sample_rate*/)
-    { std::cout << "WARNING: Setting the Sample Rate in Jack mode has no effect." << std::endl; }
+    {
+        std::cout << "WARNING: Setting the Sample Rate in Jack mode has no effect." << std::endl;
+    }
     virtual void setBufferSizeInSamples(uint32_t /*buf_size*/)
-    { std::cout << "WARNING: Setting the Sample Rate in Jack mode has no effect." << std::endl; }
+    {
+        std::cout << "WARNING: Setting the Sample Rate in Jack mode has no effect." << std::endl;
+    }
     //------------------------------------------------------------------
 
     //--------------GETTERS---------------------------------------------
@@ -113,13 +115,14 @@ public:
     virtual uint32_t getBufferSizeInSamples() const;
     /// \brief Get the Jack Server Buffer Size, in bytes
     virtual uint32_t getBufferSizeInBytes() const
-    { return (getBufferSizeInSamples() * getAudioBitResolution()/8); }
+    {
+        return (getBufferSizeInSamples() * getAudioBitResolution() / 8);
+    }
     /// \brief Get size of each audio per channel, in bytes
     virtual size_t getSizeInBytesPerChannel() const;
     //------------------------------------------------------------------
 
 private:
-
     /** \brief Private method to setup a client of the Jack server.
    * \exception std::runtime_error Can't start Jack
    *
@@ -134,7 +137,7 @@ private:
     /** \brief JACK calls this shutdown_callback if the server ever shuts down or
    * decides to disconnect the client.
    */
-    static void jackShutdown(void*);
+    static void jackShutdown(void *);
     /** \brief Set the process callback of the member function processCallback.
    * This process will be called by the JACK server whenever there is work to be done.
    */
@@ -162,28 +165,27 @@ private:
    *                              this)</tt>
    */
     // reference : http://article.gmane.org/gmane.comp.audio.jackit/12873
-    static int wrapperProcessCallback(jack_nframes_t nframes, void *arg) ;
+    static int wrapperProcessCallback(jack_nframes_t nframes, void *arg);
 
-    int mNumInChans;///< Number of Input Channels
-    int mNumOutChans; ///<  Number of Output Channels
-#ifdef WAIR // WAIR
+    int mNumInChans;     ///< Number of Input Channels
+    int mNumOutChans;    ///<  Number of Output Channels
+#ifdef WAIR              // WAIR
     int mNumNetRevChans; ///<  Number of Network Audio Channels (network comb filters
-#endif // endwhere
-    int mNumFrames; ///< Buffer block size, in samples
+#endif                   // endwhere
+    int mNumFrames;      ///< Buffer block size, in samples
     //int mAudioBitResolution; ///< Bit resolution in audio samples
     AudioInterface::audioBitResolutionT mBitResolutionMode; ///< Bit resolution (audioBitResolutionT) mode
 
-    jack_client_t* mClient; ///< Jack Client
-    const char* mClientName; ///< Jack Client Name
-    QVarLengthArray<jack_port_t*> mInPorts; ///< Vector of Input Ports (Channels)
-    QVarLengthArray<jack_port_t*> mOutPorts; ///< Vector of Output Ports (Channels)
-    QVarLengthArray<sample_t*> mInBuffer; ///< Vector of Input buffers/channel read from JACK
-    QVarLengthArray<sample_t*> mOutBuffer; ///< Vector of Output buffer/channel to write to JACK
-    size_t mSizeInBytesPerChannel; ///< Size in bytes per audio channel
-    QVector<ProcessPlugin*> mProcessPlugins; ///< Vector of ProcesPlugin<EM>s</EM>
-    JackTrip* mJackTrip; ///< JackTrip mediator class
-    static QMutex sJackMutex; ///< Mutex to make thread safe jack functions that are not
+    jack_client_t *mClient;                   ///< Jack Client
+    const char *mClientName;                  ///< Jack Client Name
+    QVarLengthArray<jack_port_t *> mInPorts;  ///< Vector of Input Ports (Channels)
+    QVarLengthArray<jack_port_t *> mOutPorts; ///< Vector of Output Ports (Channels)
+    QVarLengthArray<sample_t *> mInBuffer;    ///< Vector of Input buffers/channel read from JACK
+    QVarLengthArray<sample_t *> mOutBuffer;   ///< Vector of Output buffer/channel to write to JACK
+    size_t mSizeInBytesPerChannel;            ///< Size in bytes per audio channel
+    QVector<ProcessPlugin *> mProcessPlugins; ///< Vector of ProcesPlugin<EM>s</EM>
+    JackTrip *mJackTrip;                      ///< JackTrip mediator class
+    static QMutex sJackMutex;                 ///< Mutex to make thread safe jack functions that are not
 };
-
 
 #endif
