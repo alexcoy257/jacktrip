@@ -41,8 +41,6 @@
 #include "ProcessPlugin.h"
 #include "jacktrip_types.h"
 
-#include "JackTrip.h"
-
 #include <QVarLengthArray>
 #include <QVector>
 //#include "jacktrip_globals.h"

@@ -36,6 +36,7 @@
  */
 
 #include "AudioInterface.h"
+#include "JackTrip.h"
 
 #include <iostream>
 #include <cmath>

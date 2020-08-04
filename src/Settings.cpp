@@ -56,6 +56,7 @@
 
 #include <string>
 #include <regex>
+#include <cmath>
 
 using std::cout;
 using std::endl;
@@ -384,11 +385,12 @@ void Settings::parseInput(int argc, char **argv)
         case 'g':
         {
             //-------------------------------------------------------
+            std::string optarg_s = std::string(optarg);
             std::regex listen_regex = std::regex("l(-?[0-9][0-9]*)");
             std::regex speak_regex = std::regex("s(-?[0-9][0-9]*)");
             std::smatch base_match;
 
-            if (std::regex_search(optarg, base_match, listen_regex))
+            if (std::regex_search(optarg_s, base_match, listen_regex))
             {
                 if (base_match.size() == 2)
                 {
@@ -401,7 +403,7 @@ void Settings::parseInput(int argc, char **argv)
                 }
             }
             std::smatch speak_match;
-            if (std::regex_search(optarg, speak_match, speak_regex))
+            if (std::regex_search(optarg_s, speak_match, speak_regex))
             {
                 if (speak_match.size() == 2)
                 {
