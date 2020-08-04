@@ -409,6 +409,7 @@ void AudioInterface::computeProcessFromNetwork(QVarLengthArray<sample_t *> &out_
             //		mSizeInBytesPerChannel);
             //--------
             sample_t *tmp_sample = out_buffer[i]; //sample buffer for channel i
+            //std::cout << "listenGain is " << listenGain << std::endl;
             *tmp_sample = listenGain * *tmp_sample;
             for (unsigned int j = 0; j < n_frames; j++)
             {

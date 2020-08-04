@@ -112,7 +112,9 @@ JackTrip::JackTrip(jacktripModeT JacktripMode,
     mTcpConnectionError(false),
     mStopped(false),
     mConnectDefaultAudioPorts(true),
-    mIOStatLogStream(std::cout.rdbuf())
+    mIOStatLogStream(std::cout.rdbuf()),
+    listenGain(1.0),
+    speakGain(1.0)
 {
     createHeader(mPacketHeaderType);
 }
@@ -173,6 +175,8 @@ void JackTrip::setupAudio(
         mSampleRate = mAudioInterface->getSampleRate();
         mDeviceID = mAudioInterface->getDeviceID();
         mAudioBufferSize = mAudioInterface->getBufferSizeInSamples();
+//std::cout <<"Set listen gain to " << listenGain << std::endl;
+        mAudioInterface->setDigitalGain(listenGain, speakGain);
 #endif //__NON_JACK__
 #ifdef __NO_JACK__ /// \todo FIX THIS REPETITION OF CODE
 #ifdef __RT_AUDIO__

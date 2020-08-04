@@ -338,6 +338,7 @@ public:
     virtual void setAudioInterface(AudioInterface *const AudioInterface)
     {
         mAudioInterface = AudioInterface;
+        std::cout <<"Set listen gain to " << listenGain;
         mAudioInterface->setDigitalGain(listenGain, speakGain);
     }
 
