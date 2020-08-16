@@ -1,6 +1,7 @@
 # QtCreator user files
 *.pro.user
 *.pro.user.*
+build-jacktrip-*
 
 # build directory
 builddir/
