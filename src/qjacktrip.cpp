@@ -192,7 +192,9 @@ void QJackTrip::closeEvent(QCloseEvent *event)
 {
     //Ignore the close event so that we can override the handling of it.
     event->ignore();
+    saveSettings();
     emit signalHide();
+
     //exit();
 }
 
@@ -711,9 +713,9 @@ void QJackTrip::advancedOptionsForHubServer(bool isHubServer)
 void QJackTrip::loadSettings()
 {
 #ifdef __MAC_OSX__
-    QSettings settings("psi-borg.org", "QJackTrip");
+    QSettings settings("cuwinds.com", "LiveRehearsal");
 #else
-    QSettings settings("psi-borg", "QJackTrip");
+    QSettings settings("cuwinds", "LiveRehearsal");
 #endif
     m_ui->typeComboBox->setCurrentIndex(settings.value("RunMode", 0).toInt());
     m_ui->channelSpinBox->setValue(settings.value("Channels", gDefaultNumInChannels).toInt());
@@ -802,9 +804,9 @@ void QJackTrip::loadSettings()
 void QJackTrip::saveSettings()
 {
 #ifdef __MAC_OSX__
-    QSettings settings("psi-borg.org", "QJackTrip");
+    QSettings settings("cuwinds.com", "LiveRehearsal");
 #else
-    QSettings settings("psi-borg", "QJackTrip");
+    QSettings settings("cuwinds", "LiveRehearsal");
 #endif
     settings.setValue("RunMode", m_ui->typeComboBox->currentIndex());
     settings.setValue("LastAddress", m_ui->addressComboBox->currentText());
