@@ -64,36 +64,38 @@ using std::endl;
 int gVerboseFlag = 0;
 
 //*******************************************************************************
-Settings::Settings() : mJackTrip(NULL),
-                       mJackTripMode(JackTrip::SERVER),
-                       mDataProtocol(JackTrip::UDP),
-                       mNumChans(2),
-                       mBufferQueueLength(gDefaultQueueLength),
-                       mAudioBitResolution(AudioInterface::BIT16),
-                       mBindPortNum(gDefaultPort), mPeerPortNum(gDefaultPort),
-                       mClientName(NULL),
-                       mUnderrrunZero(false),
-                       mLoopBack(false),
-#ifdef WAIR // WAIR
-                       mNumNetRevChans(0),
-                       mWAIR(false),
-#endif // endwhere
-                       mJamLink(false),
-                       mEmptyHeader(false),
-                       mJackTripServer(false),
-                       mLocalAddress(gDefaultLocalAddress),
-                       mRedundancy(1),
-                       mUseJack(true),
-                       mChanfeDefaultSR(false),
-                       mChanfeDefaultID(0),
-                       mChanfeDefaultBS(false),
-                       mHubConnectionMode(JackTrip::SERVERTOCLIENT),
-                       mConnectDefaultAudioPorts(true),
-                       mIOStatTimeout(0),
-                       listenGain(1.0),
-                       speakGain(1.0)
-{
-}
+Settings::Settings() :
+    mJackTrip(NULL),
+    mJackTripMode(JackTrip::SERVER),
+    mDataProtocol(JackTrip::UDP),
+    mNumChans(2),
+    mBufferQueueLength(gDefaultQueueLength),
+    mAudioBitResolution(AudioInterface::BIT16),
+    mBindPortNum(gDefaultPort), mPeerPortNum(gDefaultPort),
+    mServerUdpPortNum(NULL),
+    mClientName(NULL),
+    mUnderrrunZero(false),
+    mLoopBack(false),
+    #ifdef WAIR // WAIR
+    mNumNetRevChans(0),
+    mWAIR(false),
+    #endif // endwhere
+    mJamLink(false),
+    mEmptyHeader(false),
+    mJackTripServer(false),
+    mLocalAddress(gDefaultLocalAddress),
+    mRedundancy(1),
+    mUseJack(true),
+    mChanfeDefaultSR(false),
+    mChanfeDefaultID(0),
+    mChanfeDefaultBS(false),
+    mHubConnectionMode(JackTrip::SERVERTOCLIENT),
+    mConnectDefaultAudioPorts(true),
+    mIOStatTimeout(0),
+    listenGain(1.0),
+    speakGain(1.0)
+{}
+
 
 //*******************************************************************************
 Settings::~Settings()
@@ -118,41 +120,43 @@ void Settings::parseInput(int argc, char **argv)
     //----------------------------------------------------------------------------
     static struct option longopts[] = {
         // These options don't set a flag.
-        {"numchannels", required_argument, NULL, 'n'},         // Number of input and output channels
-#ifdef WAIR                                                    // WAIR
-        {"wair", no_argument, NULL, 'w'},                      // Run in LAIR mode, sets numnetrevchannels
-        {"addcombfilterlength", required_argument, NULL, 'N'}, // added comb filter length
-        {"combfilterfeedback", required_argument, NULL, 'H'},  // comb filter feedback
-#endif                                                         // endwhere
-        {"server", no_argument, NULL, 's'},                    // Run in server mode
-        {"client", required_argument, NULL, 'c'},              // Run in client mode, set server IP address
-        {"localaddress", required_argument, NULL, 'L'},        // set local address e.g., 127.0.0.2 for second instance on same host
-        {"jacktripserver", no_argument, NULL, 'S'},            // Run in JamLink mode
-        {"pingtoserver", required_argument, NULL, 'C'},        // Run in ping to server mode, set server IP address
-        {"portoffset", required_argument, NULL, 'o'},          // Port Offset from 4464
-        {"bindport", required_argument, NULL, 'B'},            // Port Offset from 4464
-        {"peerport", required_argument, NULL, 'P'},            // Port Offset from 4464
-        {"queue", required_argument, NULL, 'q'},               // Queue Length
-        {"redundancy", required_argument, NULL, 'r'},          // Redundancy
-        {"bitres", required_argument, NULL, 'b'},              // Audio Bit Resolution
-        {"zerounderrun", no_argument, NULL, 'z'},              // Use Underrun to Zeros Mode
-        {"loopback", no_argument, NULL, 'l'},                  // Run in loopback mode
-        {"jamlink", no_argument, NULL, 'j'},                   // Run in JamLink mode
-        {"emptyheader", no_argument, NULL, 'e'},               // Run in JamLink mode
-        {"clientname", required_argument, NULL, 'J'},          // Run in JamLink mode
-        {"rtaudio", no_argument, NULL, 'R'},                   // Run in JamLink mode
-        {"srate", required_argument, NULL, 'T'},               // Set Sample Rate
-        {"deviceid", required_argument, NULL, 'd'},            // Set RTAudio device id to use
-        {"bufsize", required_argument, NULL, 'F'},             // Set buffer Size
-        {"nojackportsconnect", no_argument, NULL, 'D'},        // Don't connect default Audio Ports
-        {"version", no_argument, NULL, 'v'},                   // Version Number
-        {"verbose", no_argument, NULL, 'V'},                   // Verbose mode
-        {"hubpatch", required_argument, NULL, 'p'},            // Set hubConnectionMode for auto patch in Jack
-        {"iostat", required_argument, NULL, 'I'},              // Set IO stat timeout
-        {"iostatlog", required_argument, NULL, 'G'},           // Set IO stat log file
-        {"help", no_argument, NULL, 'h'},                      // Print Help
-        {"digitalgain", required_argument, NULL, 'g'},         // Set digital input gain
-        {NULL, 0, NULL, 0}};
+    { "numchannels", required_argument, NULL, 'n' }, // Number of input and output channels
+#ifdef WAIR // WAIR
+    { "wair", no_argument, NULL, 'w' }, // Run in LAIR mode, sets numnetrevchannels
+    { "addcombfilterlength", required_argument, NULL, 'N' }, // added comb filter length
+    { "combfilterfeedback", required_argument, NULL, 'H' }, // comb filter feedback
+#endif // endwhere
+    { "server", no_argument, NULL, 's' }, // Run in server mode
+    { "client", required_argument, NULL, 'c' }, // Run in client mode, set server IP address
+    { "localaddress", required_argument, NULL, 'L' }, // set local address e.g., 127.0.0.2 for second instance on same host
+    { "jacktripserver", no_argument, NULL, 'S' }, // Run in JamLink mode
+    { "pingtoserver", required_argument, NULL, 'C' }, // Run in ping to server mode, set server IP address
+    { "portoffset", required_argument, NULL, 'o' }, // Port Offset from 4464
+    { "bindport", required_argument, NULL, 'B' }, // Port Offset from 4464
+    { "peerport", required_argument, NULL, 'P' }, // Port Offset from 4464
+    { "udpbaseport", required_argument, NULL, 'U' }, // Server udp base port (defaults to 61002)
+    { "queue", required_argument, NULL, 'q' }, // Queue Length
+    { "redundancy", required_argument, NULL, 'r' }, // Redundancy
+    { "bitres", required_argument, NULL, 'b' }, // Audio Bit Resolution
+    { "zerounderrun", no_argument, NULL, 'z' }, // Use Underrun to Zeros Mode
+    { "loopback", no_argument, NULL, 'l' }, // Run in loopback mode
+    { "jamlink", no_argument, NULL, 'j' }, // Run in JamLink mode
+    { "emptyheader", no_argument, NULL, 'e' }, // Run in JamLink mode
+    { "clientname", required_argument, NULL, 'J' }, // Run in JamLink mode
+    { "rtaudio", no_argument, NULL, 'R' }, // Run in JamLink mode
+    { "srate", required_argument, NULL, 'T' }, // Set Sample Rate
+    { "deviceid", required_argument, NULL, 'd' }, // Set RTAudio device id to use
+    { "bufsize", required_argument, NULL, 'F' }, // Set buffer Size
+    { "nojackportsconnect" , no_argument, NULL,  'D'}, // Don't connect default Audio Ports
+    { "version", no_argument, NULL, 'v' }, // Version Number
+    { "verbose", no_argument, NULL, 'V' }, // Verbose mode
+    { "hubpatch", required_argument, NULL, 'p' }, // Set hubConnectionMode for auto patch in Jack
+    { "iostat", required_argument, NULL, 'I' }, // Set IO stat timeout
+    { "iostatlog", required_argument, NULL, 'G' }, // Set IO stat log file
+    { "help", no_argument, NULL, 'h' }, // Print Help
+    {"digitalgain", required_argument, NULL, 'g'},         // Set digital input gain
+    { NULL, 0, NULL, 0 }
+};
 
     // Parse Command Line Arguments
     //----------------------------------------------------------------------------
@@ -166,6 +170,9 @@ void Settings::parseInput(int argc, char **argv)
         case 'n': // Number of input and output channels
             //-------------------------------------------------------
             mNumChans = atoi(optarg);
+            break;
+        case 'U': // UDP Bind Port
+            mServerUdpPortNum = atoi(optarg);
             break;
 #ifdef WAIR
         case 'w':
@@ -208,14 +215,18 @@ void Settings::parseInput(int argc, char **argv)
             //-------------------------------------------------------
             mBindPortNum += atoi(optarg);
             mPeerPortNum += atoi(optarg);
+            if (gVerboseFlag) std::cout << "SETTINGS: argument parsed for TCP Bind Port: " << mBindPortNum << std::endl;
+            if (gVerboseFlag) std::cout << "SETTINGS: argument parsed for TCP Peer Port: " << mPeerPortNum << std::endl;
             break;
         case 'B': // Bind Port
             //-------------------------------------------------------
             mBindPortNum = atoi(optarg);
+            if (gVerboseFlag) std::cout << "SETTINGS: argument parsed for TCP Bind Port: " << mBindPortNum << std::endl;
             break;
         case 'P': // Peer Port
             //-------------------------------------------------------
             mPeerPortNum = atoi(optarg);
+            if (gVerboseFlag) std::cout << "SETTINGS: argument parsed for TCP Peer Port: " << mPeerPortNum << std::endl;
             break;
         case 'b':
             //-------------------------------------------------------
@@ -474,11 +485,12 @@ void Settings::printUsage()
          << gDefaultQueueLength << ")" << endl;
     cout << " -r, --redundancy  # (1 or more)          Packet Redundancy to avoid glitches with packet losses (default: 1)"
          << endl;
-    cout << " -o, --portoffset  #                      Receiving port offset from base port " << gDefaultPort << endl;
-    cout << " --bindport        #                      Set only the bind port number (default: 4464)" << endl;
-    cout << " --peerport        #                      Set only the Peer port number (default: 4464)" << endl;
+    cout << " -o, --portoffset  #                      Receiving bind port and peer port offset from default " << gDefaultPort << endl;
+    cout << " -B, --bindport        #                  Set only the bind port number (default: " << gDefaultPort << ")" << endl;
+    cout << " -P, --peerport        #                  Set only the peer port number (default: " << gDefaultPort << ")" << endl;
+    cout << " -U, --udpbaseport                        Set only the server udp base port number (default: 61002)" << endl;
     cout << " -b, --bitres      # (8, 16, 24, 32)      Audio Bit Rate Resolutions (default: 16)" << endl;
-    cout << " -p, --hubpatch    # (0, 1, 2, 3, 4)      Hub auto audio patch, only has effect if running HUB SERVER mode, 0=server-to-clients, 1=client loopback, 2=client fan out/in but not loopback, 3=reserved for TUB, 4=full mix (default: 0)" << endl;
+    cout << " -p, --hubpatch    # (0, 1, 2, 3, 4)      Hub auto audio patch, only has effect if running HUB SERVER mode, 0=server-to-clients, 1=client loopback, 2=clients can hear all clients except themselves, 3=reserved for TUB, 4=full mix (default: 0), i.e. clients auto-connect and hear all clients including themselves" << endl;
     cout << " -z, --zerounderrun                       Set buffer to zeros when underrun occurs (default: wavetable)" << endl;
     cout << " -l, --loopback                           Run in Loop-Back Mode" << endl;
     cout << " -j, --jamlink                            Run in JamLink Mode (Connect to a JamLink Box)" << endl;
@@ -493,8 +505,8 @@ void Settings::printUsage()
     cout << "   --deviceid      #                      The rtaudio device id --rtaudio mode only (default: 0)" << endl;
     cout << endl;
     cout << "ARGUMENTS TO DISPLAY IO STATISTICS:" << endl;
-    cout << "   --iostat <time_in_secs>                Turn on IO stat reporting with specified interval (in seconds)" << endl;
-    cout << "   --iostatlog <log_file>                 Save stat log into a file (default: print in stdout)" << endl;
+    cout << " -I, --iostat <time_in_secs>              Turn on IO stat reporting with specified interval (in seconds)" << endl;
+    cout << " -G, --iostatlog <log_file>               Save stat log into a file (default: print in stdout)" << endl;
     cout << endl;
     cout << "HELP ARGUMENTS: " << endl;
     cout << " -v, --version                            Prints Version Number" << endl;
@@ -508,9 +520,9 @@ void Settings::startJackTrip()
 {
 
     /// \todo Change this, just here to test
-    if (mJackTripServer)
-    {
-        UdpHubListener *udpmaster = new UdpHubListener;
+    if ( mJackTripServer ) {
+        if (gVerboseFlag) std::cout << "JackTrip HUB SERVER TCP Bind Port: " << mBindPortNum << std::endl;
+        UdpHubListener* udpmaster = new UdpHubListener(mBindPortNum,mServerUdpPortNum);
         udpmaster->setSettings(this);
 #ifdef WAIR // WAIR
         udpmaster->setWAIR(mWAIR);
@@ -558,8 +570,16 @@ void Settings::startJackTrip()
         mJackTrip = new JackTrip(mJackTripMode, mDataProtocol, mNumChans,
 #ifdef WAIR // wair
                                  mNumNetRevChans,
-#endif // endwhere
-                                 mBufferQueueLength, mRedundancy, mAudioBitResolution);
+                         #endif // endwhere
+                                 mBufferQueueLength, mRedundancy, mAudioBitResolution,
+                                 /*DataProtocol::packetHeaderTypeT PacketHeaderType = */DataProtocol::DEFAULT,
+                                 /*underrunModeT UnderRunMode = */ mUnderRunMode,
+                                 /* int receiver_bind_port = */ gDefaultPort,
+                                 /*int sender_bind_port = */ gDefaultPort,
+                                 /*int receiver_peer_port = */ gDefaultPort,
+                                 /* int sender_peer_port = */ gDefaultPort,
+                                 mPeerPortNum
+                                 );
 
         // Set connect or not default audio ports. Only work for jack
         mJackTrip->setConnectDefaultAudioPorts(mConnectDefaultAudioPorts);
@@ -580,6 +600,10 @@ void Settings::startJackTrip()
             cout << "Setting buffers to zero when underrun..." << endl;
             cout << gPrintSeparator << std::endl;
             mJackTrip->setUnderRunMode(JackTrip::ZEROS);
+        } else {
+            cout << "Setting buffers to wavetable when underrun..." << endl;
+            cout << gPrintSeparator << std::endl;
+            mJackTrip->setUnderRunMode(JackTrip::WAVETABLE);
         }
 
         // Set peer address in server mode

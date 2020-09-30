@@ -90,14 +90,16 @@ private:
     int mBufferQueueLength;                ///< Audio Buffer from network queue length
     AudioInterface::audioBitResolutionT mAudioBitResolution;
     QString mPeerAddress; ///< Peer Address to use in jacktripModeT::CLIENT Mode
-    int mBindPortNum;     ///< Bind Port Number
-    int mPeerPortNum;     ///< Peer Port Number
-    char *mClientName;    ///< JackClient Name
-    bool mUnderrrunZero;  ///< Use Underrun to Zero mode
+    int mBindPortNum; ///< Bind Port Number
+    int mPeerPortNum; ///< Peer Port Number
+    int mServerUdpPortNum;
+    char* mClientName; ///< JackClient Name
+    bool mUnderrrunZero; ///< Use Underrun to Zero mode
+    JackTrip::underrunModeT mUnderRunMode;
 
-#ifdef WAIR                 // wair
-    int mNumNetRevChans;    ///< Number of Network Audio Channels (net comb filters)
-    int mClientAddCombLen;  ///< cmd line adjustment of net comb
+#ifdef WAIR // wair
+    int mNumNetRevChans; ///< Number of Network Audio Channels (net comb filters)
+    int mClientAddCombLen; ///< cmd line adjustment of net comb
     double mClientRoomSize; ///< freeverb room size
     bool mWAIR;             ///< WAIR mode
 #endif                      // endwhere
