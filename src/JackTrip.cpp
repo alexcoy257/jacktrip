@@ -284,9 +284,17 @@ void JackTrip::setupDataProtocol()
             cout << "Using RT thread priority for UDP data" << endl;
         }
         if (mConnectionMode==ENCRYPTEDAUDIO){
-            unsigned char tkey[32] = {0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,6,0,0,5,0,0,0,0,0,0,9,0,0,5,0,0,0};
+
             ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkey);
             ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkey);
+
+            ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkeyb);
+            ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkeyb);
+
+            if (mJackTripMode == SERVER){
+                ((UdpDataProtocol *)mDataProtocolReceiver)->setPassiveKey();
+            }
+
         }
 
         std::cout << gPrintSeparator << std::endl;
@@ -1092,4 +1100,14 @@ void JackTrip::checkIfPortIsBinded(int port)
                     "Could not bind UDP socket. It may already be binded by another process on your machine. Try using a different port number");
     }
     UdpSockTemp.close(); // close the socket
+}
+
+void JackTrip::setCurrentKey(unsigned char * key, bool sw){
+    ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(key, sw);
+    ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(key, sw);
+}
+
+void JackTrip::switchCurrentKey(){
+    ((UdpDataProtocol *)mDataProtocolReceiver)->clientSwitchCurrentKey();
+    ((UdpDataProtocol *)mDataProtocolSender )->clientSwitchCurrentKey();
 }

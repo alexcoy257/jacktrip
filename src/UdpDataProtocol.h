@@ -152,14 +152,20 @@ public:
     virtual void setIssueSimulation(double loss, double jitter, double max_delay);
 
     /**
-     * Set the current key. The first 32 bytes of the buffer supplied
-     * will be used as the current key.
-     *
-     * TODO: Make this function thread-safe.
+     * Set the complement of the current key. Switch if sw, otherwise switch when
+     * we start receiving packets from the other key.
+     * This function should be thread-safe. Todo: test.
      */
-    void setCurrentKey(unsigned char * newKey){
-        memcpy(keys[currentKey], newKey, 32);
-    }
+    void setCurrentKey(unsigned char * newKey, bool sw = false);
+
+    /**
+     * This function is not going to be useful outside of local testing. We
+     * should probably guard it from outside users.
+     */
+    void clientSwitchCurrentKey(){switchCurrentKey();}
+
+    void setPassiveKey(){passiveSide = true;}
+    void setActiveKey(){passiveSide = false;}
 
 private slots:
     void printUdpWaitedTooLong(int wait_msec);
@@ -168,6 +174,7 @@ private slots:
                 unsigned char *iv, unsigned char *ciphertext);
     int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
                 unsigned char *iv, unsigned char *plaintext);
+    void switchCurrentKey();
     
 
 signals:
@@ -261,9 +268,11 @@ private:
     std::uniform_real_distribution<double> mUniformDist;
 
     // encryption
-    uint8_t currentKey = 0;
+    int currentKey = 0;
     unsigned char iv[16];
     unsigned char keys[2][32];
+    QMutex * keyReaderMutexes[2];
+    bool passiveSide = false;
     EVP_CIPHER_CTX *ctx;
 
 };

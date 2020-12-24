@@ -66,7 +66,8 @@ enum JTLongOptIDS {
   OPT_SIMJITTER,
   OPT_BROADCAST,
   OPT_RTUDPPRIORITY,
-  OPT_ENCRYPTION
+  OPT_ENCRYPTION,
+  OPT_TESTKEYROTATE
 };
 
 //*******************************************************************************
@@ -172,6 +173,7 @@ void Settings::parseInput(int argc, char** argv)
         { "help", no_argument, NULL, 'h' }, // Print Help
         { "examine-audio-delay", required_argument, NULL, 'x' }, // test mode - measure audio round-trip latency statistics
         { "encryption", no_argument, NULL, OPT_ENCRYPTION },
+        { "test-key-rotate", no_argument, NULL, OPT_TESTKEYROTATE },
         { NULL, 0, NULL, 0 }
     };
 
@@ -491,6 +493,9 @@ void Settings::parseInput(int argc, char** argv)
           break; }
         case OPT_ENCRYPTION: {
           encryptionSetting = true;
+          break; }
+        case OPT_TESTKEYROTATE: {
+          keyRotate = true;
           break; }
         default: {
             //-------------------------------------------------------
@@ -835,6 +840,11 @@ JackTrip *Settings::getConfiguredJackTrip()
 
     if (encryptionSetting){
         jackTrip->setConnectionMode(JackTrip::ENCRYPTEDAUDIO);
+    }
+
+    if (keyRotate){
+
+
     }
 
     return jackTrip;

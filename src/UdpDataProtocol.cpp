@@ -97,6 +97,9 @@ UdpDataProtocol::UdpDataProtocol(JackTrip* jacktrip, const runModeT runmode,
 
     if(!(ctx = EVP_CIPHER_CTX_new()))
         handleEnDecryptErrors();
+
+    keyReaderMutexes[0] = new QMutex();
+    keyReaderMutexes[1] = new QMutex();
 }
 
 
@@ -461,7 +464,8 @@ void UdpDataProtocol::run()
     mSmplSize = mJackTrip->getAudioBitResolution() / 8;
 
     // Setup Full Packet buffer
-    int full_packet_size = mJackTrip->getPacketSizeInBytes() + (mJackTrip->getConnectionMode()==JackTrip::ENCRYPTEDAUDIO?16:0);
+    int full_packet_size = mJackTrip->getPacketSizeInBytes() +
+            (JackTrip::encrypted_audio_mode_mask(mJackTrip->getConnectionMode())==JackTrip::ENCRYPTEDAUDIO?16:0);
     //cout << "full_packet_size: " << full_packet_size << endl;
     mFullPacket = new int8_t[full_packet_size];
     std::memset(mFullPacket, 0, full_packet_size); // set buffer to 0
@@ -573,7 +577,7 @@ void UdpDataProtocol::run()
         int peer_chans = mJackTrip->getPeerNumChannels(full_redundant_packet);
         full_packet_size = mJackTrip->getHeaderSizeInBytes()
                            + mJackTrip->getPeerBufferSize(full_redundant_packet) * peer_chans * mSmplSize +
-                (mJackTrip->getPeerConnectionMode(full_redundant_packet)==JackTrip::ENCRYPTEDAUDIO?16:0);
+                (JackTrip::encrypted_audio_mode_mask(mJackTrip->getPeerConnectionMode(full_redundant_packet))==JackTrip::ENCRYPTEDAUDIO?16:0);
 
         if (full_packet_size - mJackTrip->getHeaderSizeInBytes() > mJackTrip->getTotalAudioPacketSizeInBytes() && (mAudioPacket != NULL)){
             delete[] mAudioPacket;
@@ -811,15 +815,28 @@ void UdpDataProtocol::receivePacketRedundancy(int8_t* full_redundant_packet,
         int8_t* src = full_redundant_packet + (i*full_packet_size) + hdr_size;
 
 
-        if (mJackTrip->getConnectionMode()==JackTrip::ENCRYPTEDAUDIO){
+        //std::cout <<"Mode " <<  (uint16_t)mJackTrip->getPeerConnectionMode(fPacket) <<std::endl;
+        //std::cout <<"Masked " <<  JackTrip::encrypted_audio_mode_mask(mJackTrip->getPeerConnectionMode(fPacket)) <<std::endl;
+        if (JackTrip::encrypted_audio_mode_mask(mJackTrip->getPeerConnectionMode(fPacket))==JackTrip::ENCRYPTEDAUDIO){
+
+            //The idea here is that the server sends a new key over a secure, reliable channel. When the other
+            //client starts using that key, the server swaps over.
+
+            int peerKey = JackTrip::encrypted_audio_key_mask(mJackTrip->getPeerConnectionMode(fPacket));
+
+            if (passiveSide && peerKey == 1-currentKey){
+                mJackTrip->switchCurrentKey();
+                std::cout <<"Client started using new key \n";
+            }
+
             unsigned char iv[16];
             *(uint64_t * )iv = mJackTrip->getPeerTimeStamp(fPacket);
             *(uint64_t * )(iv + 8) = *(uint64_t * )iv;
 
             //qDebug() <<"Decrypting: " <<mJackTrip->getTotalAudioPacketSizeInBytes() + 16;
             //QByteArray tkey((char *)keys[currentKey], 32);
-            //qDebug() <<"Decryption key: " <<tkey;
-            decrypt((unsigned char *)src, mJackTrip->getTotalAudioPacketSizeInBytes() + 16, keys[currentKey], iv, (unsigned char *)mAudioPacket);
+            //std::cout <<"Decryption key: " <<peerKey <<std::endl;
+            decrypt((unsigned char *)src, mJackTrip->getTotalAudioPacketSizeInBytes() + 16, keys[peerKey], iv, (unsigned char *)mAudioPacket);
             src = mAudioPacket;
         }
 
@@ -897,14 +914,18 @@ void UdpDataProtocol::sendPacketRedundancy(int8_t* full_redundant_packet,
 
     mJackTrip->putHeaderInPacket(mFullPacket, src);
 
-    if (mJackTrip->getConnectionMode() == JackTrip::ENCRYPTEDAUDIO){
+
+    if (JackTrip::encrypted_audio_mode_mask( mJackTrip->getConnectionMode()) == JackTrip::ENCRYPTEDAUDIO){
         *(uint64_t *)(iv) = mJackTrip->getPeerTimeStamp(mFullPacket);
         *(uint64_t *)(iv+8) = *(uint64_t *)(iv);
         //qDebug() <<"encrypted bytes: " <<
+        //std::cout <<"Key " <<currentKey <<std::endl;
+        //std::cout <<"Encryption key: " <<currentKey <<std::endl;
         encrypt((unsigned char *)src, mJackTrip->getTotalAudioPacketSizeInBytes(), keys[currentKey], iv, (unsigned char *)audio_part);
         //QByteArray tkey((char *)keys[currentKey], 32);
         //qDebug() <<"Encryption key: " <<tkey;
     }
+
     // Move older packets to end of array of redundant packets
     std::memmove(full_redundant_packet+full_packet_size,
                  full_redundant_packet,
@@ -995,6 +1016,28 @@ bool UdpDataProtocol::datagramAvailable()
     return (n != -1 || errno == EMSGSIZE);
 #endif
 }
+
+void UdpDataProtocol::setCurrentKey(unsigned char *newKey, bool sw)
+{
+        QMutexLocker lock(keyReaderMutexes[1-currentKey]);
+        memcpy(keys[1 - currentKey], newKey, 32);
+
+        if (sw){
+            QMutexLocker lock(keyReaderMutexes[currentKey]);
+            currentKey = 1-currentKey;
+            uint32_t mt = JackTrip::ENCRYPTEDAUDIO | currentKey;
+            mJackTrip->setConnectionMode(*reinterpret_cast<JackTrip::connectionModeT *>(&mt));
+        }
+}
+
+void UdpDataProtocol::switchCurrentKey(){
+    currentKey = 1-currentKey;
+    uint32_t mt = JackTrip::ENCRYPTEDAUDIO | currentKey;
+    mJackTrip->setConnectionMode(*reinterpret_cast<JackTrip::connectionModeT *>(&mt));
+
+    std::cout <<"Mode " << mJackTrip->getConnectionMode() <<std::endl;
+}
+
 
 void UdpDataProtocol::handleEnDecryptErrors(void)
 {

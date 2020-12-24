@@ -76,6 +76,7 @@ public:
 
     bool getLoopBack() { return mLoopBack; }
     bool isHubServer() { return mJackTripServer; }
+    bool needKeyRotate(){return keyRotate;}
 
 private:
     JackTrip::jacktripModeT mJackTripMode; ///< JackTrip::jacktripModeT
@@ -124,7 +125,8 @@ private:
     int mBroadcastQueue;
     bool mUseRtUdpPriority;
     AudioTester mAudioTester;
-    bool encryptionSetting = false;;
+    bool encryptionSetting = false;
+    bool keyRotate = false;
 };
 
 #endif

@@ -96,6 +96,9 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
     QScopedPointer<JackTrip> jackTrip;
     QScopedPointer<UdpHubListener> udpHub;
+    QScopedPointer<QTimer> testTimer(new QTimer(nullptr));
+
+    //testTimer->setInterval(1000);
     
     QLoggingCategory::setFilterRules(QStringLiteral("*.debug=true"));
     qInstallMessageHandler(qtMessageHandler);
@@ -140,6 +143,13 @@ int main(int argc, char *argv[])
         
         if (gVerboseFlag) std::cout << "step 6" << std::endl;
         if (gVerboseFlag) std::cout << "jmain before app->exec()" << std::endl;
+        if (settings.needKeyRotate() && JackTrip::encrypted_audio_mode_mask(jackTrip->getConnectionMode()) == JackTrip::ENCRYPTEDAUDIO){
+            testTimer->setInterval(1000);
+            testTimer->callOnTimeout([&](){jackTrip->clientSwitchCurrentKey();
+            std::cout <<"Swapping keys \n";});
+
+            testTimer->start();
+        }
     } catch (const std::exception &e) {
         std::cerr << "ERROR:" << std::endl;
         std::cerr << e.what() << std::endl;
@@ -148,5 +158,6 @@ int main(int argc, char *argv[])
         return -1;
     }
     
+
     return app.exec();
 }

@@ -107,8 +107,17 @@ public:
         NORMAL, ///< Normal Mode
         KSTRONG,  ///< Karplus Strong
         JAMTEST,  ///< Karplus Strong
-        ENCRYPTEDAUDIO
+        ENCRYPTEDAUDIO = 0x80,
+        ENCRYPTEDAUDIOKEYB = 0x81
     };
+
+    static inline uint8_t encrypted_audio_key_mask(connectionModeT t ){return (uint8_t) t&1;}
+    static inline uint8_t encrypted_audio_key_mask(uint8_t t ){return t&1;}
+    static inline connectionModeT encrypted_audio_mode_mask(connectionModeT t ){uint32_t r = t&0x80; return *reinterpret_cast<connectionModeT *>(&r);}
+    static inline connectionModeT encrypted_audio_mode_mask(uint8_t t ){uint32_t r = t&0x80; return *reinterpret_cast<connectionModeT *>(&r);}
+
+    unsigned char tkey[32] = {0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,6,0,0,5,0,0,0,0,0,0,9,0,0,5,0,0,0};
+    unsigned char tkeyb[32] = {0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,6,0,0,5,0,0,0,0,0,4,0,0,0,7,0,8,0};
 
     /// \brief Enum for Hub Server Audio Connection Mode (connections to hub server are automatically patched in Jack)
     enum hubConnectionModeT {
@@ -460,6 +469,11 @@ public slots:
     void slotReceivedConnectionFromPeer()
     { mReceivedConnection = true; emit signalReceivedConnectionFromPeer(); }
     void onStatTimer();
+
+    void setCurrentKey(unsigned char * key, bool sw);
+
+    void switchCurrentKey();
+    void clientSwitchCurrentKey(){switchCurrentKey();}
     
 private slots:
     void receivedConnectionTCP();

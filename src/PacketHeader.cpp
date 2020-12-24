@@ -171,7 +171,10 @@ void DefaultHeader::checkPeerSettings(int8_t* full_packet)
         std::cerr << "ERROR: Peer connection mode is ";
           switch(peer_header->ConnectionMode){
             case JackTrip::ENCRYPTEDAUDIO:
-              std::cerr <<"Encrypted Audio";
+              std::cerr <<"Encrypted Audio Key A";
+              break;
+            case JackTrip::ENCRYPTEDAUDIOKEYB:
+              std::cerr <<"Encrypted Audio Key B";
               break;
           case JackTrip::NORMAL:
               std::cerr <<"Unencrypted audio";
@@ -188,9 +191,12 @@ void DefaultHeader::checkPeerSettings(int8_t* full_packet)
           }
           std::cerr << "Local connection mode is ";
             switch(mHeader.ConnectionMode){
-              case JackTrip::ENCRYPTEDAUDIO:
-                std::cerr <<"Encrypted Audio";
-                break;
+            case JackTrip::ENCRYPTEDAUDIO:
+              std::cerr <<"Encrypted Audio Key A";
+              break;
+            case JackTrip::ENCRYPTEDAUDIOKEYB:
+              std::cerr <<"Encrypted Audio Key B";
+              break;
             case JackTrip::NORMAL:
                 std::cerr <<"Unencrypted audio";
               break;
