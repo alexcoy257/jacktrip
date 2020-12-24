@@ -142,6 +142,9 @@ const int gMaxThreads = 1024;
 
 /// Public well-known UDP port to where the clients will connect
 const int gServerUdpPort = 4464;
+
+/// Encryption Mode
+const bool gDefaultEncryptionMode = false;
 //@}
 
 

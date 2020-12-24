@@ -283,6 +283,12 @@ void JackTrip::setupDataProtocol()
         if (mUseRtUdpPriority) {
             cout << "Using RT thread priority for UDP data" << endl;
         }
+        if (mConnectionMode==ENCRYPTEDAUDIO){
+            unsigned char tkey[32] = {0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,6,0,0,5,0,0,0,0,0,0,9,0,0,5,0,0,0};
+            ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkey);
+            ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkey);
+        }
+
         std::cout << gPrintSeparator << std::endl;
         break;
     case TCP:
@@ -1027,6 +1033,7 @@ void JackTrip::createHeader(const DataProtocol::packetHeaderTypeT headertype)
 
 
 //*******************************************************************************
+///TODO: rename this so that this doesn't imply that it puts the audio in the packet as well.
 void JackTrip::putHeaderInPacket(int8_t* full_packet, int8_t* audio_packet)
 {
     mPacketHeader->fillHeaderCommonFromAudio();
@@ -1036,7 +1043,10 @@ void JackTrip::putHeaderInPacket(int8_t* full_packet, int8_t* audio_packet)
     audio_part = full_packet + mPacketHeader->getHeaderSizeInBytes();
     //std::memcpy(audio_part, audio_packet, mAudioInterface->getBufferSizeInBytes());
     //std::memcpy(audio_part, audio_packet, mAudioInterface->getSizeInBytesPerChannel() * mNumChans);
+    //
+    if (mConnectionMode != ENCRYPTEDAUDIO){
     std::memcpy(audio_part, audio_packet, getTotalAudioPacketSizeInBytes());
+    }
 }
 
 

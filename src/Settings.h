@@ -124,6 +124,7 @@ private:
     int mBroadcastQueue;
     bool mUseRtUdpPriority;
     AudioTester mAudioTester;
+    bool encryptionSetting = false;;
 };
 
 #endif

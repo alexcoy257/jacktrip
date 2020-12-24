@@ -194,3 +194,6 @@ DEPENDPATH += ../externals/rtaudio-4.1.1/
 HEADERS +=
 SOURCES +=
 }
+
+# OpenSSL primitives for encrypted UDP protocol
+LIBS += -lcrypto

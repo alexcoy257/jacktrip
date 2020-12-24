@@ -45,10 +45,16 @@
 #include <QMutex>
 #include <vector>
 #include <random>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+
 
 #include "DataProtocol.h"
 #include "jacktrip_types.h"
 #include "jacktrip_globals.h"
+
+
 
 /** \brief UDP implementation of DataProtocol class
  *
@@ -145,8 +151,23 @@ public:
     virtual bool getStats(PktStat* stat);
     virtual void setIssueSimulation(double loss, double jitter, double max_delay);
 
+    /**
+     * Set the current key. The first 32 bytes of the buffer supplied
+     * will be used as the current key.
+     *
+     * TODO: Make this function thread-safe.
+     */
+    void setCurrentKey(unsigned char * newKey){
+        memcpy(keys[currentKey], newKey, 32);
+    }
+
 private slots:
     void printUdpWaitedTooLong(int wait_msec);
+    void handleEnDecryptErrors();
+    int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+                unsigned char *iv, unsigned char *ciphertext);
+    int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+                unsigned char *iv, unsigned char *plaintext);
     
 
 signals:
@@ -193,6 +214,8 @@ protected:
                                       int full_redundant_packet_size,
                                       int full_packet_size);
 
+
+
 private:
     bool datagramAvailable();
     
@@ -236,6 +259,13 @@ private:
     double mSimulatedJitterMaxDelay;
     std::default_random_engine mRndEngine;
     std::uniform_real_distribution<double> mUniformDist;
+
+    // encryption
+    uint8_t currentKey = 0;
+    unsigned char iv[16];
+    unsigned char keys[2][32];
+    EVP_CIPHER_CTX *ctx;
+
 };
 
 #endif // __UDPDATAPROTOCOL_H__

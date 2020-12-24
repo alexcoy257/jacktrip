@@ -57,6 +57,8 @@
 #include <sys/fcntl.h>
 #endif
 
+
+
 using std::cout; using std::endl;
 
 // NOTE: It's better not to use
@@ -92,6 +94,9 @@ UdpDataProtocol::UdpDataProtocol(JackTrip* jacktrip, const runModeT runmode,
     mSimulatedLossRate = 0.0;
     mSimulatedJitterRate = 0.0;
     mSimulatedJitterMaxDelay = 0.0;
+
+    if(!(ctx = EVP_CIPHER_CTX_new()))
+        handleEnDecryptErrors();
 }
 
 
@@ -100,6 +105,9 @@ UdpDataProtocol::~UdpDataProtocol()
 {
     delete[] mAudioPacket;
     delete[] mFullPacket;
+
+    /* Clean up */
+    EVP_CIPHER_CTX_free(ctx);
     if (mRunMode == RECEIVER) {
 #ifdef __WIN_32__
         closesocket(mSocket);
@@ -453,7 +461,7 @@ void UdpDataProtocol::run()
     mSmplSize = mJackTrip->getAudioBitResolution() / 8;
 
     // Setup Full Packet buffer
-    int full_packet_size = mJackTrip->getPacketSizeInBytes();
+    int full_packet_size = mJackTrip->getPacketSizeInBytes() + (mJackTrip->getConnectionMode()==JackTrip::ENCRYPTEDAUDIO?16:0);
     //cout << "full_packet_size: " << full_packet_size << endl;
     mFullPacket = new int8_t[full_packet_size];
     std::memset(mFullPacket, 0, full_packet_size); // set buffer to 0
@@ -564,7 +572,18 @@ void UdpDataProtocol::run()
 
         int peer_chans = mJackTrip->getPeerNumChannels(full_redundant_packet);
         full_packet_size = mJackTrip->getHeaderSizeInBytes()
-                           + mJackTrip->getPeerBufferSize(full_redundant_packet) * peer_chans * mSmplSize;
+                           + mJackTrip->getPeerBufferSize(full_redundant_packet) * peer_chans * mSmplSize +
+                (mJackTrip->getPeerConnectionMode(full_redundant_packet)==JackTrip::ENCRYPTEDAUDIO?16:0);
+
+        if (full_packet_size - mJackTrip->getHeaderSizeInBytes() > mJackTrip->getTotalAudioPacketSizeInBytes() && (mAudioPacket != NULL)){
+            delete[] mAudioPacket;
+            mAudioPacket = new int8_t[full_packet_size - mJackTrip->getHeaderSizeInBytes()];
+            if (!mAudioPacket){
+                emit signalError("Could not resize receiving buffer.");
+            }
+
+        }
+
         /*
         cout << "peer sizes: " << mJackTrip->getHeaderSizeInBytes()
              << " + " << mJackTrip->getPeerBufferSize(full_redundant_packet)
@@ -776,6 +795,7 @@ void UdpDataProtocol::receivePacketRedundancy(int8_t* full_redundant_packet,
 
     int peer_chans = mJackTrip->getPeerNumChannels(full_redundant_packet);
     int N = mJackTrip->getPeerBufferSize(full_redundant_packet);
+
     int host_buf_size = N * mChans * mSmplSize;
     int hdr_size = mJackTrip->getHeaderSizeInBytes();
     int gap_size = mInitialState ? 0 : (lost - redun_last_index) * host_buf_size;
@@ -787,7 +807,22 @@ void UdpDataProtocol::receivePacketRedundancy(int8_t* full_redundant_packet,
     }
     // Send to audio all available audio packets, in order
     for (int i = redun_last_index; i>=0; i--) {
+        int8_t* fPacket = full_redundant_packet + (i*full_packet_size);
         int8_t* src = full_redundant_packet + (i*full_packet_size) + hdr_size;
+
+
+        if (mJackTrip->getConnectionMode()==JackTrip::ENCRYPTEDAUDIO){
+            unsigned char iv[16];
+            *(uint64_t * )iv = mJackTrip->getPeerTimeStamp(fPacket);
+            *(uint64_t * )(iv + 8) = *(uint64_t * )iv;
+
+            //qDebug() <<"Decrypting: " <<mJackTrip->getTotalAudioPacketSizeInBytes() + 16;
+            //QByteArray tkey((char *)keys[currentKey], 32);
+            //qDebug() <<"Decryption key: " <<tkey;
+            decrypt((unsigned char *)src, mJackTrip->getTotalAudioPacketSizeInBytes() + 16, keys[currentKey], iv, (unsigned char *)mAudioPacket);
+            src = mAudioPacket;
+        }
+
         if (1 != mChans) {
             // Convert packet's non-interleaved layout to interleaved one used internally
             int8_t* dst = mBuffer.data();
@@ -858,8 +893,18 @@ void UdpDataProtocol::sendPacketRedundancy(int8_t* full_redundant_packet,
         }
         src = dst;
     }
+    int8_t * audio_part = mFullPacket + mJackTrip->getHeaderSizeInBytes();
+
     mJackTrip->putHeaderInPacket(mFullPacket, src);
 
+    if (mJackTrip->getConnectionMode() == JackTrip::ENCRYPTEDAUDIO){
+        *(uint64_t *)(iv) = mJackTrip->getPeerTimeStamp(mFullPacket);
+        *(uint64_t *)(iv+8) = *(uint64_t *)(iv);
+        //qDebug() <<"encrypted bytes: " <<
+        encrypt((unsigned char *)src, mJackTrip->getTotalAudioPacketSizeInBytes(), keys[currentKey], iv, (unsigned char *)audio_part);
+        //QByteArray tkey((char *)keys[currentKey], 32);
+        //qDebug() <<"Encryption key: " <<tkey;
+    }
     // Move older packets to end of array of redundant packets
     std::memmove(full_redundant_packet+full_packet_size,
                  full_redundant_packet,
@@ -949,4 +994,88 @@ bool UdpDataProtocol::datagramAvailable()
     //We have a datagram if our buffer is too small or if no error.
     return (n != -1 || errno == EMSGSIZE);
 #endif
+}
+
+void UdpDataProtocol::handleEnDecryptErrors(void)
+{
+    ERR_print_errors_fp(stderr);
+    //abort();
+}
+
+int UdpDataProtocol::encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+            unsigned char *iv, unsigned char *ciphertext)
+{
+
+    int len;
+
+    int ciphertext_len;
+
+    /*
+     * Initialise the encryption operation. IMPORTANT - ensure you use a key
+     * and IV size appropriate for your cipher
+     * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+     * IV size for *most* modes is the same as the block size. For AES this
+     * is 128 bits
+     */
+    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+        handleEnDecryptErrors();
+
+    /*
+     * Provide the message to be encrypted, and obtain the encrypted output.
+     * EVP_EncryptUpdate can be called multiple times if necessary
+     */
+    if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+        handleEnDecryptErrors();
+    ciphertext_len = len;
+
+    /*
+     * Finalise the encryption. Further ciphertext bytes may be written at
+     * this stage.
+     */
+    if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
+        handleEnDecryptErrors();
+    ciphertext_len += len;
+
+
+
+    return ciphertext_len;
+}
+
+int UdpDataProtocol::decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+            unsigned char *iv, unsigned char *plaintext)
+{
+
+
+    int len;
+
+    int plaintext_len;
+
+    /*
+     * Initialise the decryption operation. IMPORTANT - ensure you use a key
+     * and IV size appropriate for your cipher
+     * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+     * IV size for *most* modes is the same as the block size. For AES this
+     * is 128 bits
+     */
+    if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+        handleEnDecryptErrors();
+
+    /*
+     * Provide the message to be decrypted, and obtain the plaintext output.
+     * EVP_DecryptUpdate can be called multiple times if necessary.
+     */
+    if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+        handleEnDecryptErrors();
+    plaintext_len = len;
+
+    /*
+     * Finalise the decryption. Further plaintext bytes may be written at
+     * this stage.
+     */
+    if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
+        handleEnDecryptErrors();
+    plaintext_len += len;
+
+
+    return plaintext_len;
 }

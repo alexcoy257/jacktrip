@@ -66,6 +66,7 @@ enum JTLongOptIDS {
   OPT_SIMJITTER,
   OPT_BROADCAST,
   OPT_RTUDPPRIORITY,
+  OPT_ENCRYPTION
 };
 
 //*******************************************************************************
@@ -170,6 +171,7 @@ void Settings::parseInput(int argc, char** argv)
         { "udprt", no_argument, NULL, OPT_RTUDPPRIORITY },
         { "help", no_argument, NULL, 'h' }, // Print Help
         { "examine-audio-delay", required_argument, NULL, 'x' }, // test mode - measure audio round-trip latency statistics
+        { "encryption", no_argument, NULL, OPT_ENCRYPTION },
         { NULL, 0, NULL, 0 }
     };
 
@@ -486,6 +488,9 @@ void Settings::parseInput(int argc, char** argv)
           printUsage();
           printf("*** Unknown, missing, or ambiguous option argument *** see above for usage\n\n");
           std::exit(1);
+          break; }
+        case OPT_ENCRYPTION: {
+          encryptionSetting = true;
           break; }
         default: {
             //-------------------------------------------------------
@@ -827,6 +832,10 @@ JackTrip *Settings::getConfiguredJackTrip()
         }
     }
 #endif // endwhere
+
+    if (encryptionSetting){
+        jackTrip->setConnectionMode(JackTrip::ENCRYPTEDAUDIO);
+    }
 
     return jackTrip;
 }

@@ -106,7 +106,8 @@ public:
     enum connectionModeT {
         NORMAL, ///< Normal Mode
         KSTRONG,  ///< Karplus Strong
-        JAMTEST  ///< Karplus Strong
+        JAMTEST,  ///< Karplus Strong
+        ENCRYPTEDAUDIO
     };
 
     /// \brief Enum for Hub Server Audio Connection Mode (connections to hub server are automatically patched in Jack)
@@ -412,7 +413,7 @@ public:
             return mAudioInterface->getSizeInBytesPerChannel() * mNumNetRevChans;
         else // not wair
 #endif // endwhere
-            return mAudioInterface->getSizeInBytesPerChannel() * mNumChans;
+            return (mAudioInterface->getSizeInBytesPerChannel() * mNumChans); //+ (mEncryptionMode?16:0);
     }
     //@}
     //------------------------------------------------------------------------------------

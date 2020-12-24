@@ -166,6 +166,46 @@ void DefaultHeader::checkPeerSettings(int8_t* full_packet)
         error = true;
     }
 
+    if ( peer_header->ConnectionMode != mHeader.ConnectionMode)
+    {
+        std::cerr << "ERROR: Peer connection mode is ";
+          switch(peer_header->ConnectionMode){
+            case JackTrip::ENCRYPTEDAUDIO:
+              std::cerr <<"Encrypted Audio";
+              break;
+          case JackTrip::NORMAL:
+              std::cerr <<"Unencrypted audio";
+            break;
+          case JackTrip::KSTRONG:
+              std::cerr <<"Karpus-Strong";
+            break;
+          case JackTrip::JAMTEST:
+              std::cerr <<"Jamtest";
+              break;
+          default:
+              std::cerr <<"Unrecognized";
+              break;
+          }
+          std::cerr << "Local connection mode is ";
+            switch(mHeader.ConnectionMode){
+              case JackTrip::ENCRYPTEDAUDIO:
+                std::cerr <<"Encrypted Audio";
+                break;
+            case JackTrip::NORMAL:
+                std::cerr <<"Unencrypted audio";
+              break;
+            case JackTrip::KSTRONG:
+                std::cerr <<"Karpus-Strong";
+              break;
+            case JackTrip::JAMTEST:
+                std::cerr <<"Jamtest";
+                break;
+            default:
+                std::cerr <<"Unrecognized";
+                break;
+            }
+    }
+
     // Exit program if error
     if (error)
     {
