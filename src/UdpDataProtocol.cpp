@@ -570,6 +570,7 @@ void UdpDataProtocol::run()
         full_redundant_packet_size = 0x10000;  // max UDP datagram size
         full_redundant_packet = new int8_t[full_redundant_packet_size];
         full_redundant_packet_size = receivePacket(reinterpret_cast<char*>(full_redundant_packet), full_redundant_packet_size);
+        std::cout<<"Discovered packet size of " << full_redundant_packet_size <<std::endl;
         // Check that peer has the same audio settings
         if (gVerboseFlag) std::cout << std::endl << "    UdpDataProtocol:run" << mRunMode << " before mJackTrip->checkPeerSettings()" << std::endl;
         mJackTrip->checkPeerSettings(full_redundant_packet);

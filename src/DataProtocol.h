@@ -50,6 +50,8 @@
 //#include <tr1/memory> //for shared_ptr
 #endif
 
+#include "libjacktrip_global.h"
+
 #include <iostream>
 
 #include <QThread>
@@ -90,7 +92,7 @@ class JackTrip; // forward declaration
  *
  * Each transmission (i.e., inputs and outputs) run on its own thread.
  */
-class DataProtocol : public QThread
+class LIBJACKTRIP_EXPORT DataProtocol : public QThread
 {
     Q_OBJECT;
 

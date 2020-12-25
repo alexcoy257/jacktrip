@@ -59,6 +59,8 @@
 #include "RingBuffer.h"
 #include "AudioTester.h"
 
+#include "libjacktrip_global.h"
+
 //#include <signal.h>
 /** \brief Main class to creates a SERVER (to listen) or a CLIENT (to connect
  * to a listening server) to send audio streams in the network.
@@ -68,7 +70,7 @@
  * Classes that uses JackTrip methods need to register with it.
  */
 
-class JackTrip : public QObject
+class LIBJACKTRIP_EXPORT JackTrip : public QObject
 {
     Q_OBJECT;
 
@@ -103,7 +105,7 @@ public:
     };
 
     /// \brief Enum for Connection Mode (in packet header)
-    enum connectionModeT {
+    enum connectionModeT: std::uint8_t {
         NORMAL, ///< Normal Mode
         KSTRONG,  ///< Karplus Strong
         JAMTEST,  ///< Karplus Strong

@@ -5,12 +5,18 @@
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
-CONFIG += qt thread debug_and_release build_all
-CONFIG(debug, debug|release) {
-  TARGET = jacktrip_debug
-  } else {
-  TARGET = jacktrip
-  }
+
+
+#CONFIG += qt thread debug_and_release build_all
+CONFIG += qt thread
+#CONFIG(debug, debug|release) {
+#  TARGET = jacktrip_debug
+#} else {
+#  TARGET = jacktrip
+#  }
+
+TEMPLATE += lib
+DEFINES += LIBJACKTRIP_LIBRARY
 
 QT -= gui
 QT += network
@@ -108,7 +114,7 @@ win32 {
 #cc    DEFINES -= UNICODE #RtAudio for Qt
 }
 
-DESTDIR = .
+#DESTDIR = .
 QMAKE_CLEAN += -r ./jacktrip ./jacktrip_debug ./release ./debug
 
 # isEmpty(PREFIX) will allow path to be changed during the command line
@@ -151,6 +157,7 @@ HEADERS += DataProtocol.h \
            UdpHubListener.h \
            AudioInterface.h \
            compressordsp.h \
+           libjacktrip_global.h \
            limiterdsp.h \
            freeverbdsp.h
 

@@ -41,6 +41,8 @@
 #include "AudioInterface.h"
 //#include "JackAudioInterface.h"
 
+#include <QtCore/QtGlobal>
+
 /// \todo Add this namespace
 //namespace JackTrip
 
