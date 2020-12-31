@@ -48,6 +48,8 @@
 #include <QTimer>
 #include <QSharedPointer>
 
+#ifdef LIBJACKTRIP_LIBRARY
+
 #include "DataProtocol.h"
 #include "AudioInterface.h"
 
@@ -58,6 +60,7 @@
 #include "PacketHeader.h"
 #include "RingBuffer.h"
 #include "AudioTester.h"
+#endif
 
 #include "libjacktrip_global.h"
 

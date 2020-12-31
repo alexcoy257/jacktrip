@@ -15,7 +15,16 @@ CONFIG += qt thread
 #  TARGET = jacktrip
 #  }
 
-TEMPLATE += lib
+CONFIG += file_copies
+
+COPIES += libraryHeaders
+
+libraryHeaders.files = JackTrip.h libjacktrip_global.h
+libraryHeaders.path = ./include/jacktrip
+
+DESTDIR=./lib
+
+TEMPLATE = lib
 DEFINES += LIBJACKTRIP_LIBRARY
 
 QT -= gui
@@ -45,6 +54,8 @@ INCLUDEPATH += ../faust-src-lair/stk
     message(Building NONJACK)
     LIBS -= -ljack
   }
+  # OpenSSL primitives for encrypted UDP protocol
+  LIBS += -lcrypto
 }
 
 macx {
@@ -102,10 +113,23 @@ linux-g++-64 {
 win32 {
   message(Building on win32)
 #cc  CONFIG += x86 console
-  CONFIG += c++11 console
-  INCLUDEPATH += "C:\Program Files (x86)\Jack\includes"
-  LIBS += "C:\Program Files (x86)\Jack\lib\libjack64.lib"
-  LIBS += "C:\Program Files (x86)\Jack\lib\libjackserver64.lib"
+  QMAKE_CXXFLAGS += -fPIC
+  CONFIG += c++11 console static staticlib
+  DEFINES += STATIC_LIBJACKTRIP
+
+#INCLUDEPATH += "C:\Program Files (x86)\Jack\includes"
+#LIBS += "C:\Program Files (x86)\Jack\lib\libjack64.lib"
+#LIBS += "C:\Program Files (x86)\Jack\lib\libjackserver64.lib"
+#LIBS += "C:/Qt/Tools/OpenSSL/Win_x64/lib/libcrypto.lib"
+
+#INCLUDEPATH += C:/Qt/Tools/OpenSSL/Win_x64/include
+
+INCLUDEPATH += C:/msys64/mingw64/include
+LIBS += -lcrypto
+
+INCLUDEPATH += "C:\Program Files\JACK2\include"
+LIBS += "C:\Program Files\JACK2\lib\libjack64.lib"
+LIBS += "C:\Program Files\JACK2\lib\libjackserver64.lib"
 #cc  QMAKE_CXXFLAGS += -D__WINDOWS_ASIO__ #-D__UNIX_JACK__ #RtAudio Flags
   #QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++ -lpthread
   LIBS += -lWs2_32 #cc -lOle32 #needed by rtaudio/asio
@@ -115,7 +139,7 @@ win32 {
 }
 
 #DESTDIR = .
-QMAKE_CLEAN += -r ./jacktrip ./jacktrip_debug ./release ./debug
+#QMAKE_CLEAN += -r ./jacktrip ./jacktrip_debug ./release ./debug
 
 # isEmpty(PREFIX) will allow path to be changed during the command line
 # call to qmake, e.g. qmake PREFIX=/usr
@@ -159,7 +183,8 @@ HEADERS += DataProtocol.h \
            compressordsp.h \
            libjacktrip_global.h \
            limiterdsp.h \
-           freeverbdsp.h
+           freeverbdsp.h \
+           libjacktrip_global.h
 
 !nojack {
 HEADERS += JackAudioInterface.h
@@ -202,5 +227,4 @@ HEADERS +=
 SOURCES +=
 }
 
-# OpenSSL primitives for encrypted UDP protocol
-LIBS += -lcrypto
+
