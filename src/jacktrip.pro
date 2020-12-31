@@ -15,6 +15,7 @@ CONFIG += qt thread
 #  TARGET = jacktrip
 #  }
 
+
 CONFIG += file_copies
 
 COPIES += libraryHeaders
@@ -23,6 +24,7 @@ libraryHeaders.files = JackTrip.h libjacktrip_global.h
 libraryHeaders.path = ./include/jacktrip
 
 DESTDIR=./lib
+
 
 TEMPLATE = lib
 DEFINES += LIBJACKTRIP_LIBRARY
@@ -45,11 +47,12 @@ nojack {
 INCLUDEPATH += ../faust-src-lair/stk
 
 !win32 {
-  INCLUDEPATH+=/usr/local/include
+#  INCLUDEPATH+=/usr/local/include
 # wair needs stk, can be had from linux this way
 # INCLUDEPATH+=/usr/include/stk
 # LIBS += -L/usr/local/lib -ljack -lstk -lm
-  LIBS += -L/usr/local/lib -ljack -lm
+#  LIBS += -L/usr/local/lib
+  LIBS += -ljack -lm
   nojack {
     message(Building NONJACK)
     LIBS -= -ljack
@@ -61,12 +64,16 @@ INCLUDEPATH += ../faust-src-lair/stk
 macx {
   message(Building on MAC OS X)
   QMAKE_CXXFLAGS += -D__MACOSX_CORE__ #-D__UNIX_JACK__ #RtAudio Flags
-  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
   #QMAKE_MAC_SDK = macosx10.9
   CONFIG -= app_bundle
   #CONFIG += x86 #ppc #### If you have both libraries installed, you
   # can change between 32bits (x86) or 64bits(x86_64) Change this to go back to 32 bits (x86)
   LIBS += -framework CoreAudio -framework CoreFoundation
+  INCLUDEPATH+=/Volumes/Alex_Coy_Projects_2/jack2/include
+  INCLUDEPATH+=/Volumes/Alex_Coy_Projects_2/openssl-bin/include
+  LIBS += -L/Volumes/Alex_Coy_Projects_2/jack2/lib
+  LIBS += -L/Volumes/Alex_Coy_Projects_2/openssl-bin/lib
   DEFINES += __MAC_OSX__
   }
 
