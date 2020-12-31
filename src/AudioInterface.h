@@ -46,15 +46,20 @@
 #include <QVector>
 //#include "jacktrip_globals.h"
 
+#include "libjacktrip_global.h"
+
 // Forward declarations
 class JackTrip;
+
+
+
 
 //using namespace JackTripNamespace;
 
 
 /** \brief Base Class that provides an interface with audio
  */
-class AudioInterface
+class LIBJACKTRIP_EXPORT AudioInterface
 {
 public:
 
@@ -210,6 +215,10 @@ public:
    * \return Sample Rate in Hz
    */
     static int getSampleRateFromType(samplingRateT rate_type);
+    /// \brief Get audio port from network
+    virtual audioPortHandle_t getPortFromNetwork(int n){return NULL;};
+    /// \brief Get audio port to network
+    virtual audioPortHandle_t getPortToNetwork(int n){return NULL;};
     //------------------------------------------------------------------
 
 

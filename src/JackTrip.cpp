@@ -404,7 +404,7 @@ void JackTrip::appendProcessPluginFromNetwork(ProcessPlugin* plugin)
 
 
 //*******************************************************************************
-void JackTrip::startProcess(
+LIBJACKTRIP_EXPORT void JackTrip::startProcess(
         #ifdef WAIRTOHUB // WAIR
         int ID
         #endif // endwhere
@@ -1110,4 +1110,12 @@ void JackTrip::setCurrentKey(unsigned char * key, bool sw){
 void JackTrip::switchCurrentKey(){
     ((UdpDataProtocol *)mDataProtocolReceiver)->clientSwitchCurrentKey();
     ((UdpDataProtocol *)mDataProtocolSender )->clientSwitchCurrentKey();
+}
+
+audioPortHandle_t JackTrip::getAudioPortToNet(int channel){
+    return mAudioInterface->getPortToNetwork(channel);
+}
+
+audioPortHandle_t JackTrip::getAudioPortFromNet(int channel){
+    return mAudioInterface->getPortToNetwork(channel);
 }

@@ -50,17 +50,22 @@
 
 #ifdef LIBJACKTRIP_LIBRARY
 
-#include "DataProtocol.h"
-#include "AudioInterface.h"
+
 
 #ifndef __NO_JACK__
 #include "JackAudioInterface.h"
 #endif //__NO_JACK__
 
+
+
+#endif
+
+#include "DataProtocol.h"
+#include "AudioInterface.h"
 #include "PacketHeader.h"
 #include "RingBuffer.h"
 #include "AudioTester.h"
-#endif
+
 
 #include "libjacktrip_global.h"
 
@@ -311,6 +316,8 @@ public:
     { mAudiointerfaceMode = audiointerface_mode; }
     virtual void setAudioInterface(AudioInterface* const AudioInterface)
     { mAudioInterface = AudioInterface; }
+    virtual audioPortHandle_t getAudioPortToNet(int channel);
+    virtual audioPortHandle_t getAudioPortFromNet(int channel);
     virtual void setLoopBack(bool b)
     { mLoopBack = b; }
     virtual void setAudioTesterP(AudioTester* atp) { mAudioTesterP = atp; }
@@ -479,6 +486,10 @@ public slots:
 
     void switchCurrentKey();
     void clientSwitchCurrentKey(){switchCurrentKey();}
+
+    void signalJackReady(QVarLengthArray<audioPortHandle_t> from,
+                         QVarLengthArray<audioPortHandle_t> to,
+                         QVarLengthArray<audioPortHandle_t> broadcast){emit jackPortsReady(from, to, broadcast);}
     
 private slots:
     void receivedConnectionTCP();
@@ -497,6 +508,9 @@ signals:
     void signalError(const QString &errorMessage);
     void signalReceivedConnectionFromPeer();
     void signalUdpWaitingTooLong();
+    void jackPortsReady(QVarLengthArray<audioPortHandle_t> from,
+                        QVarLengthArray<audioPortHandle_t> to,
+                        QVarLengthArray<audioPortHandle_t> broadcast);
 
 public:
 

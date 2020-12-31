@@ -206,6 +206,8 @@ void JackAudioInterface::createChannels()
                                                JackPortIsOutput, 0);
         }
     }
+
+    mJackTrip->signalJackReady(mInPorts, mOutPorts, mBroadcastPorts);
 }
 
 
@@ -384,7 +386,19 @@ void JackAudioInterface::connectDefaultPorts()
 
 
 
+audioPortHandle_t JackAudioInterface::getPortFromNetwork(int id){
+    if (id < mOutPorts.size())
+        return mOutPorts[id];
+    else
+        return NULL;
+}
 
+audioPortHandle_t JackAudioInterface::getPortToNetwork(int id){
+    if (id < mInPorts.size())
+        return mInPorts[id];
+    else
+        return NULL;
+}
 
 
 

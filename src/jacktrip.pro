@@ -20,7 +20,7 @@ CONFIG += file_copies
 
 COPIES += libraryHeaders
 
-libraryHeaders.files = JackTrip.h libjacktrip_global.h
+libraryHeaders.files = JackTrip.h libjacktrip_global.h jacktrip_types.h
 libraryHeaders.path = ./include/jacktrip
 
 DESTDIR=./lib

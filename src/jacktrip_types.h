@@ -56,6 +56,14 @@
   typedef float sample_t;
   //@}
 
+    #ifndef __NO_JACK__
+#include <jack/jack.h>
+///Handle to an audio port.
+typedef jack_port_t* audioPortHandle_t;
+#else
+typedef void audioPortHandle_t;
+#endif
+
 
   //-------------------------------------------------------------------------------
   /** \name Typedefs that guaranty some specific bit length

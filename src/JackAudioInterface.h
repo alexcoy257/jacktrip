@@ -49,6 +49,9 @@
 #include <QMutex>
 
 
+
+
+
 #include "jacktrip_types.h"
 #include "ProcessPlugin.h"
 #include "AudioInterface.h"
@@ -117,6 +120,10 @@ public:
     { return (getBufferSizeInSamples() * getAudioBitResolution() / 8); }
     /// \brief Get size of each audio per channel, in bytes
     virtual size_t getSizeInBytesPerChannel() const;
+    /// \brief Get audio port from network
+    virtual audioPortHandle_t getPortFromNetwork(int n);
+    /// \brief Get audio port to network
+    virtual audioPortHandle_t getPortToNetwork(int n);
     //------------------------------------------------------------------
 
 private:
