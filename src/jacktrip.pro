@@ -114,22 +114,25 @@ win32 {
   message(Building on win32)
 #cc  CONFIG += x86 console
   QMAKE_CXXFLAGS += -fPIC
-  CONFIG += c++11 console static staticlib
-  DEFINES += STATIC_LIBJACKTRIP
+  CONFIG += c++11 console lib #static staticlib
+  #DEFINES += STATIC_LIBJACKTRIP
 
 #INCLUDEPATH += "C:\Program Files (x86)\Jack\includes"
 #LIBS += "C:\Program Files (x86)\Jack\lib\libjack64.lib"
 #LIBS += "C:\Program Files (x86)\Jack\lib\libjackserver64.lib"
-#LIBS += "C:/Qt/Tools/OpenSSL/Win_x64/lib/libcrypto.lib"
+LIBS += "C:/Qt/Tools/OpenSSL/Win_x64/lib/libcrypto.lib"
 
-#INCLUDEPATH += C:/Qt/Tools/OpenSSL/Win_x64/include
+INCLUDEPATH += C:/Qt/Tools/OpenSSL/Win_x64/include
 
 INCLUDEPATH += C:/msys64/mingw64/include
-LIBS += -lcrypto
+#LIBS += -lcrypto
 
-INCLUDEPATH += "C:\Program Files\JACK2\include"
-LIBS += "C:\Program Files\JACK2\lib\libjack64.lib"
-LIBS += "C:\Program Files\JACK2\lib\libjackserver64.lib"
+LIBS += "C:\msys64\mingw64\lib\libjack64.dll.a"
+LIBS += "C:\msys64\mingw64\lib\libjackserver64.dll.a"
+
+#INCLUDEPATH += "C:\Program Files\JACK2\include"
+#LIBS += "C:\Program Files\JACK2\lib\libjack64.lib"
+#LIBS += "C:\Program Files\JACK2\lib\libjackserver64.lib"
 #cc  QMAKE_CXXFLAGS += -D__WINDOWS_ASIO__ #-D__UNIX_JACK__ #RtAudio Flags
   #QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++ -lpthread
   LIBS += -lWs2_32 #cc -lOle32 #needed by rtaudio/asio
