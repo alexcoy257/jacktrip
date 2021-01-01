@@ -1119,3 +1119,16 @@ audioPortHandle_t JackTrip::getAudioPortToNet(int channel){
 audioPortHandle_t JackTrip::getAudioPortFromNet(int channel){
     return mAudioInterface->getPortToNetwork(channel);
 }
+
+void JackTrip::signalJackReady(QVarLengthArray<audioPortHandle_t> from,
+                               QVarLengthArray<audioPortHandle_t> to,
+                               QVarLengthArray<audioPortHandle_t> broadcast)
+{
+    if(m_fromSpace)
+        std::memcpy(m_fromSpace, from.constData(), qMin(from.length(), (signed) m_portSpaceSize)*sizeof(audioPortHandle_t));
+    if(m_toSpace)
+        std::memcpy(m_toSpace, to.constData(), qMin(to.length(), (signed) m_portSpaceSize)*sizeof(audioPortHandle_t));
+    if(m_broadcastSpace)
+        std::memcpy(m_broadcastSpace, broadcast.constData(), qMin(broadcast.length(), (signed) m_portSpaceSize)*sizeof(audioPortHandle_t));
+
+    emit jackPortsReady();}

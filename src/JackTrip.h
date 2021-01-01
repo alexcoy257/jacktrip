@@ -489,7 +489,15 @@ public slots:
 
     void signalJackReady(QVarLengthArray<audioPortHandle_t> from,
                          QVarLengthArray<audioPortHandle_t> to,
-                         QVarLengthArray<audioPortHandle_t> broadcast){emit jackPortsReady(from, to, broadcast);}
+                         QVarLengthArray<audioPortHandle_t> broadcast);
+
+
+    void setJackPortAreas(audioPortHandle_t * fs, audioPortHandle_t * ts,audioPortHandle_t * bs, size_t size){
+        m_fromSpace = fs;
+        m_toSpace = ts;
+        m_broadcastSpace = bs;
+        m_portSpaceSize = size;
+    }
     
 private slots:
     void receivedConnectionTCP();
@@ -508,9 +516,7 @@ signals:
     void signalError(const QString &errorMessage);
     void signalReceivedConnectionFromPeer();
     void signalUdpWaitingTooLong();
-    void jackPortsReady(QVarLengthArray<audioPortHandle_t> from,
-                        QVarLengthArray<audioPortHandle_t> to,
-                        QVarLengthArray<audioPortHandle_t> broadcast);
+    void jackPortsReady();
 
 public:
 
@@ -612,6 +618,11 @@ private:
     double mSimulatedJitterRate;
     double mSimulatedDelayRel;
     bool mUseRtUdpPriority;
+
+    audioPortHandle_t * m_fromSpace;
+    audioPortHandle_t * m_toSpace;
+    audioPortHandle_t * m_broadcastSpace;
+    size_t m_portSpaceSize;
 
     AudioTester* mAudioTesterP;
 };

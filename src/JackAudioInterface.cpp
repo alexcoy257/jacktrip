@@ -207,7 +207,7 @@ void JackAudioInterface::createChannels()
         }
     }
 
-    mJackTrip->signalJackReady(mInPorts, mOutPorts, mBroadcastPorts);
+
 }
 
 
@@ -261,6 +261,8 @@ int JackAudioInterface::startProcess() const
         std::cerr << "Cannot activate client" << std::endl;
         return(code);
     }
+    //Out ports are from network, in ports are to network, and broadcast ports are from the network
+    mJackTrip->signalJackReady(mOutPorts, mInPorts, mBroadcastPorts);
     return(0);
 }
 

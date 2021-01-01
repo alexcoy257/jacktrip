@@ -562,11 +562,13 @@ void UdpDataProtocol::run()
         if (gVerboseFlag) std::cout << "    UdpDataProtocol:run" << mRunMode << " before !UdpSocket.hasPendingDatagrams()" << std::endl;
         std::cout << "Waiting for Peer..." << std::endl;
         // This blocks waiting for the first packet
-        while ( !datagramAvailable() ) {
+
+        while ( !datagramAvailable()) {
             if (mStopped) { return; }
             QThread::msleep(100);
             if (gVerboseFlag) std::cout << "100ms  " << std::flush;
         }
+
         full_redundant_packet_size = 0x10000;  // max UDP datagram size
         full_redundant_packet = new int8_t[full_redundant_packet_size];
         full_redundant_packet_size = receivePacket(reinterpret_cast<char*>(full_redundant_packet), full_redundant_packet_size);
