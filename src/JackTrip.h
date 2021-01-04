@@ -619,10 +619,10 @@ private:
     double mSimulatedDelayRel;
     bool mUseRtUdpPriority;
 
-    audioPortHandle_t * m_fromSpace;
-    audioPortHandle_t * m_toSpace;
-    audioPortHandle_t * m_broadcastSpace;
-    size_t m_portSpaceSize;
+    audioPortHandle_t * m_fromSpace = NULL;
+    audioPortHandle_t * m_toSpace = NULL;
+    audioPortHandle_t * m_broadcastSpace = NULL;
+    size_t m_portSpaceSize = 0;
 
     AudioTester* mAudioTesterP;
 };
