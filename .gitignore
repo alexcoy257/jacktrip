@@ -6,3 +6,6 @@ build*
 
 # build directory
 builddir/
+
+#public header files possibly from qinstall
+src/include

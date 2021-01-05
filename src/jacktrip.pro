@@ -15,22 +15,45 @@ CONFIG += qt thread
 #  TARGET = jacktrip
 #  }
 
+!isEmpty(jack){
+message(Using JACK at $$jack)
+INCLUDEPATH+=$$jack/include
+LIBS += -L$$jack/lib
+}
 
-CONFIG += file_copies
+!isEmpty(openssl){
+message(Using OpenSSL at $$openssl)
+INCLUDEPATH+=$$openssl/include
+LIBS += -L$$openssl/lib
+}
 
+# isEmpty(PREFIX) will allow path to be changed during the command line
+# call to qmake, e.g. qmake PREFIX=/usr
+isEmpty(PREFIX) {
+ PREFIX = /usr/local
+}
+
+#/Volumes/Alex_Coy_Projects_2/openssl-bin
+
+message(Installing to $$PREFIX)
+target.path = $$PREFIX/bin/
+
+CONFIG(shared){
+message(Building shared library)
+CONFIG += file_copies create_prl
 COPIES += libraryHeaders
-
+INSTALLS += libraryHeaders
 libraryHeaders.files = JackTrip.h libjacktrip_global.h jacktrip_types.h \
 jacktrip_globals.h DataProtocol.h AudioInterface.h ProcessPlugin.h \
 AudioTester.h PacketHeader.h Ringbuffer.h
 
-libraryHeaders.path = ./include/jacktrip
+libraryHeaders.path = $$PREFIX/include/jacktrip
 
 DESTDIR=./lib
-
-
 TEMPLATE = lib
 DEFINES += LIBJACKTRIP_LIBRARY
+target.path = $$PREFIX/lib/
+}
 
 QT -= gui
 QT += network
@@ -73,10 +96,6 @@ macx {
   #CONFIG += x86 #ppc #### If you have both libraries installed, you
   # can change between 32bits (x86) or 64bits(x86_64) Change this to go back to 32 bits (x86)
   LIBS += -framework CoreAudio -framework CoreFoundation
-  INCLUDEPATH+=/Volumes/Alex_Coy_Projects_2/jack2/include
-  INCLUDEPATH+=/Volumes/Alex_Coy_Projects_2/openssl-bin/include
-  LIBS += -L/Volumes/Alex_Coy_Projects_2/jack2/lib
-  LIBS += -L/Volumes/Alex_Coy_Projects_2/openssl-bin/lib
   DEFINES += __MAC_OSX__
   }
 
@@ -154,12 +173,9 @@ LIBS += "C:\msys64\mingw64\lib\libjackserver64.dll.a"
 #DESTDIR = .
 #QMAKE_CLEAN += -r ./jacktrip ./jacktrip_debug ./release ./debug
 
-# isEmpty(PREFIX) will allow path to be changed during the command line
-# call to qmake, e.g. qmake PREFIX=/usr
-isEmpty(PREFIX) {
- PREFIX = /usr/local
-}
-target.path = $$PREFIX/bin/
+
+
+
 INSTALLS += target
 
 # for plugins
