@@ -6,6 +6,7 @@ build*
 
 # build directory
 builddir/
+.vscode
 
 #public header files possibly from qinstall
 src/include

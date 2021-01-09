@@ -839,7 +839,15 @@ void UdpDataProtocol::receivePacketRedundancy(int8_t* full_redundant_packet,
             //qDebug() <<"Decrypting: " <<mJackTrip->getTotalAudioPacketSizeInBytes() + 16;
             //QByteArray tkey((char *)keys[currentKey], 32);
             //std::cout <<"Decryption key: " <<peerKey <<std::endl;
-            decrypt((unsigned char *)src, mJackTrip->getTotalAudioPacketSizeInBytes() + 16, keys[peerKey], iv, (unsigned char *)mAudioPacket);
+            bool err = false;
+            decrypt((unsigned char *)src,
+                mJackTrip->getTotalAudioPacketSizeInBytes() + 16,
+                keys[peerKey], iv, (unsigned char *)mAudioPacket, &err);
+
+            //Decrypt errors sound really bad so it's best to zero them out.
+            if (err)
+                memset(mAudioPacket, 0, mJackTrip->getTotalAudioPacketSizeInBytes());
+            
             src = mAudioPacket;
         }
 
@@ -1042,8 +1050,10 @@ void UdpDataProtocol::switchCurrentKey(){
 }
 
 
-void UdpDataProtocol::handleEnDecryptErrors(void)
+void UdpDataProtocol::handleEnDecryptErrors(bool * err)
 {
+    if(err)
+        *err = true;
     ERR_print_errors_fp(stderr);
     //abort();
 }
@@ -1088,7 +1098,7 @@ int UdpDataProtocol::encrypt(unsigned char *plaintext, int plaintext_len, unsign
 }
 
 int UdpDataProtocol::decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
-            unsigned char *iv, unsigned char *plaintext)
+            unsigned char *iv, unsigned char *plaintext, bool * decryptErr)
 {
 
 
@@ -1104,14 +1114,14 @@ int UdpDataProtocol::decrypt(unsigned char *ciphertext, int ciphertext_len, unsi
      * is 128 bits
      */
     if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-        handleEnDecryptErrors();
+        handleEnDecryptErrors(decryptErr);
 
     /*
      * Provide the message to be decrypted, and obtain the plaintext output.
      * EVP_DecryptUpdate can be called multiple times if necessary.
      */
     if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
-        handleEnDecryptErrors();
+        handleEnDecryptErrors(decryptErr);
     plaintext_len = len;
 
     /*
@@ -1119,7 +1129,7 @@ int UdpDataProtocol::decrypt(unsigned char *ciphertext, int ciphertext_len, unsi
      * this stage.
      */
     if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
-        handleEnDecryptErrors();
+        handleEnDecryptErrors(decryptErr);
     plaintext_len += len;
 
 

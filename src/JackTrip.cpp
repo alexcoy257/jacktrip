@@ -291,7 +291,7 @@ void JackTrip::setupDataProtocol()
             ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkeyb);
             ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkeyb);
 
-            if (mJackTripMode == SERVER){
+            if (mJackTripMode == SERVER || mJackTripMode == SERVERPINGSERVER){
                 ((UdpDataProtocol *)mDataProtocolReceiver)->setPassiveKey();
             }
 
