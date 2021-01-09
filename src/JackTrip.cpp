@@ -1107,6 +1107,11 @@ void JackTrip::setCurrentKey(unsigned char * key, bool sw){
     ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(key, sw);
 }
 
+void JackTrip::primeKey(unsigned char * key){
+    memcpy(&tkey, key, 32);
+    memcpy(&tkeyb, key, 32);
+}
+
 void JackTrip::switchCurrentKey(){
     ((UdpDataProtocol *)mDataProtocolReceiver)->clientSwitchCurrentKey();
     ((UdpDataProtocol *)mDataProtocolSender )->clientSwitchCurrentKey();

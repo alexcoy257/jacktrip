@@ -484,6 +484,12 @@ public slots:
 
     void setCurrentKey(unsigned char * key, bool sw);
 
+    /**
+     * Prime the JackTrip with a 256-bit encryption key.
+     * The key fed may be freed after this call.
+     */
+    void primeKey(unsigned char * key);
+
     void switchCurrentKey();
     void clientSwitchCurrentKey(){switchCurrentKey();}
 
