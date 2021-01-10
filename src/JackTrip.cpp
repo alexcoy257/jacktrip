@@ -284,12 +284,13 @@ void JackTrip::setupDataProtocol()
             cout << "Using RT thread priority for UDP data" << endl;
         }
         if (mConnectionMode==ENCRYPTEDAUDIO){
+            cout << "Setting initial encryption keys" << endl;
+            qDebug() <<"Key: " <<QByteArray((char *)tkey, 32);
+            ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkey, true);
+            ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkey, true);
 
-            ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkey);
-            ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkey);
-
-            ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkeyb);
-            ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkeyb);
+            ((UdpDataProtocol *)mDataProtocolSender)->setCurrentKey(tkeyb, true);
+            ((UdpDataProtocol *)mDataProtocolReceiver)->setCurrentKey(tkeyb, true);
 
             if (mJackTripMode == SERVER || mJackTripMode == SERVERPINGSERVER){
                 ((UdpDataProtocol *)mDataProtocolReceiver)->setPassiveKey();

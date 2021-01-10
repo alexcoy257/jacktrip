@@ -1066,6 +1066,12 @@ int UdpDataProtocol::encrypt(unsigned char *plaintext, int plaintext_len, unsign
 
     int ciphertext_len;
 
+    printf("Key: ");
+    printf("%x",key[0]);
+    for (int i=1; i<32; i++)
+    printf(",%x",key[i]);
+    printf("\n");
+
     /*
      * Initialise the encryption operation. IMPORTANT - ensure you use a key
      * and IV size appropriate for your cipher
