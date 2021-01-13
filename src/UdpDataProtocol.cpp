@@ -841,12 +841,13 @@ void UdpDataProtocol::receivePacketRedundancy(int8_t* full_redundant_packet,
             //std::cout <<"Decryption key: " <<peerKey <<std::endl;
             bool err = false;
             decrypt((unsigned char *)src,
-                mJackTrip->getTotalAudioPacketSizeInBytes() + 16,
+                //mJackTrip->getTotalAudioPacketSizeInBytes() + 16,
+                host_buf_size + 16,
                 keys[peerKey], iv, (unsigned char *)mAudioPacket, &err);
 
             //Decrypt errors sound really bad so it's best to zero them out.
             if (err)
-                memset(mAudioPacket, 0, mJackTrip->getTotalAudioPacketSizeInBytes());
+                memset(mAudioPacket, 0, host_buf_size);
             
             src = mAudioPacket;
         }
@@ -1066,11 +1067,13 @@ int UdpDataProtocol::encrypt(unsigned char *plaintext, int plaintext_len, unsign
 
     int ciphertext_len;
 
+/*
     printf("Key: ");
     printf("%x",key[0]);
     for (int i=1; i<32; i++)
     printf(",%x",key[i]);
     printf("\n");
+    */
 
     /*
      * Initialise the encryption operation. IMPORTANT - ensure you use a key
