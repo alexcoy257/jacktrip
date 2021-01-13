@@ -841,6 +841,7 @@ void UdpDataProtocol::receivePacketRedundancy(int8_t* full_redundant_packet,
             //std::cout <<"Decryption key: " <<peerKey <<std::endl;
             bool err = false;
             decrypt((unsigned char *)src,
+                //mJackTrip->getTotalAudioPacketSizeInBytes() + 16,
                 host_buf_size + 16,
                 keys[peerKey], iv, (unsigned char *)mAudioPacket, &err);
 
